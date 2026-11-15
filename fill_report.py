@@ -182,10 +182,9 @@ def build(res_dir):
             f"{len(changed)} changes, against up to {wo_hi} without it; the check sent up to "
             f"{100 * changed.retake_share.max():.0f}% of photos to a retake. Strong compression failed the other way: "
             f"specificity fell to {100 * wspec.specificity:.1f}% ({lab(wspec)}), so many healthy eyes would be referred")
-        d["stress_brief"] = (f"sensitivity on the {name} photos fell from {100 * clean.sensitivity:.1f}% to "
-                             f"{100 * worst.sensitivity:.1f}% ({lab(worst)}), yet with the quality check false all-clears "
-                             f"stayed at {w_hi} or fewer ({int(clean.referable_all_clear_with_check)} on the originals), against "
-                             f"up to {wo_hi} without it; strong compression instead cut specificity to {100 * wspec.specificity:.1f}%")
+        d["stress_brief"] = (f"on external photos sensitivity fell to {100 * worst.sensitivity:.1f}% at worst ({lab(worst)}), yet with the quality check "
+                             f"false all-clears stayed at {w_hi} or fewer, against up to {wo_hi} without it; strong compression "
+                             f"cut specificity to {100 * wspec.specificity:.1f}%")
         d["stress_short"] = (f"On deliberately worse photos: at most {w_hi} false all-clears with the check, "
                              f"up to {wo_hi} without it.")
         T_stress = table([[("original" if c.change == "clean" else f"{c.change.replace('_', ' ')}, {c.strength}"), c.photos,
@@ -226,6 +225,46 @@ def build(res_dir):
                  ("sight_threatening_given_all_clear", "Grade 3 to 4 eyes given an all-clear")]
         T["workflow"] = table([[label, wo[k], w[k]] for k, label in names], ["", "Without quality check", "With quality check"])
     T["stress"] = T_stress
+    v2p = os.path.join(os.path.dirname(os.path.abspath(res_dir)), "results_v2", "results.json")
+    if os.path.exists(v2p):      # v2 (pre-registered, PREREGISTRATION_v2.md): reported next to v1 whatever the verdict
+        V = json.load(open(v2p))
+        R["v2"] = V
+        ve, vw, va, v1e = V["results"]["external_all"], V["workflow"]["with_quality_gate"], V["results"]["fine_tuned"], r["external_all"]
+        nc = V.get("deepdrid_near_copies_in_oiaddr", 0)
+        tests = [("DeepDRiD sensitivity at least 66.1%", f"{100 * ve['sensitivity']:.1f}%", ve["sensitivity"] >= 0.661),
+                 ("DeepDRiD specificity at least 85.0%", f"{100 * ve['specificity']:.1f}%", ve["specificity"] >= 0.850),
+                 ("APTOS test AUC at least 0.950", f"{va['AUC']:.3f}", va["AUC"] >= 0.950),
+                 ("At most 46 referable eyes given an all-clear (400-photo workflow)", str(vw["referable_given_all_clear"]),
+                  vw["referable_given_all_clear"] <= 46),
+                 ("Fewer than 16 DeepDRiD photos with a near-copy in the added photos", str(nc), nc < 16)]
+        failed = [t for t in tests if not t[2]]
+        d["v2_failed_n"], d["v2_tests_n"] = len(failed), len(tests)
+        d["v2_verdict"] = ("it passed all of them, so v2 replaces v1 in the demo" if not failed else
+                           f"it failed {len(failed)} of {len(tests)} pre-set tests, so v1 stays the demo model")
+        d["v2_near_copies"] = nc
+        T["v2_tests"] = table([(n, v, "pass" if ok else "**fail**") for n, v, ok in tests], ["Pre-registered test", "v2", "Result"])
+        pct = lambda x: f"{100 * x:.1f}%"
+        rows = [("DeepDRiD, all 1,600 photos: sensitivity", pct(v1e["sensitivity"]), pct(ve["sensitivity"])),
+                ("DeepDRiD: specificity", pct(v1e["specificity"]), pct(ve["specificity"])),
+                ("DeepDRiD: AUC", f"{v1e['AUC']:.3f}", f"{ve['AUC']:.3f}")]
+        if "external_no_near_copies" in V["results"]:
+            vn = V["results"]["external_no_near_copies"]
+            rows.append((f"DeepDRiD without the {nc} near-copies: sensitivity / specificity", "(none removed)",
+                         f"{pct(vn['sensitivity'])} / {pct(vn['specificity'])}"))
+        rows += [("APTOS test (352): AUC", f"{r['fine_tuned']['AUC']:.3f}", f"{va['AUC']:.3f}"),
+                 ("APTOS test: sensitivity / specificity", f"{pct(r['fine_tuned']['sensitivity'])} / {pct(r['fine_tuned']['specificity'])}",
+                  f"{pct(va['sensitivity'])} / {pct(va['specificity'])}"),
+                 ("400-photo workflow: refer / retake / rescreen",
+                  f"{R['workflow']['with_quality_gate']['REFER']} / {R['workflow']['with_quality_gate']['RETAKE']} / {R['workflow']['with_quality_gate']['RESCREEN']}",
+                  f"{vw['REFER']} / {vw['RETAKE']} / {vw['RESCREEN']}"),
+                 ("400-photo workflow: referable eyes given an all-clear (severe or proliferative)",
+                  f"{R['workflow']['with_quality_gate']['referable_given_all_clear']} ({R['workflow']['with_quality_gate']['sight_threatening_given_all_clear']})",
+                  f"{vw['referable_given_all_clear']} ({vw['sight_threatening_given_all_clear']})")]
+        if "oiaddr_test" in V["results"]:
+            o = V["results"]["oiaddr_test"]
+            rows.append((f"OIA-DDR test ({o['n']}; same hospitals as its training photos): AUC, sensitivity / specificity", "not tested",
+                         f"{o['AUC']:.3f}, {pct(o['sensitivity'])} / {pct(o['specificity'])}"))
+        T["v2_compare"] = table(rows, ["", "v1 (APTOS only)", "v2 (APTOS + OIA-DDR)"])
     R["derived"], R["table"] = d, T
     return R
 
@@ -302,6 +341,7 @@ def main():
     outputs, all_missing = {}, []
     for tpl, out in (("README.template.md", "README.md"), ("VIDEO_SCRIPT.template.md", "VIDEO_SCRIPT.md")):
         text, used = apply_team(open(tpl, encoding="utf-8").read(), team)
+        text = re.sub(r"<!-- if:v2 -->(.*?)<!-- /if:v2 -->", (lambda m: m.group(1)) if "v2" in R else "", text, flags=re.S)
         text, missing = fill(text, R)
         outputs[out] = text
         all_missing += [f"{tpl}: {m}" for m in missing]

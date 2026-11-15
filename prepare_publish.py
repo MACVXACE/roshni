@@ -42,6 +42,11 @@ def main():
     for f in os.listdir(os.path.join(src, "results")):
         if f not in SKIP_RESULTS:
             shutil.copy(os.path.join(src, "results", f), os.path.join(x.out, "results", f))
+    if os.path.isdir(os.path.join(src, "results_v2")):      # v2 (pre-registered): published next to v1, no APTOS photos
+        os.makedirs(os.path.join(x.out, "results_v2"), exist_ok=True)
+        for f in os.listdir(os.path.join(src, "results_v2")):
+            if f not in SKIP_RESULTS:
+                shutil.copy(os.path.join(src, "results_v2", f), os.path.join(x.out, "results_v2", f))
     # README.md / VIDEO_SCRIPT.md: re-filled from the results + TEAM_INPUTS.md with the current templates
     cwd = os.getcwd()
     os.chdir(x.out)

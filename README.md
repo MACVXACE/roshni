@@ -40,8 +40,9 @@ Held-out APTOS test (352 photos, 152 referable) and the external DeepDRiD set:
 | Fine-tuned, external DeepDRiD (China) | 0.911 (0.897 to 0.925) | 56.1% | 97.2% | 307 | 25 |
 
 - **By severity (APTOS test):** 17 of 17 severe and 29 of 33 proliferative eyes were referred.
-- **External photos:** at the frozen cut-off sensitivity fell to 56.1% though AUC stayed 0.911: the ranking carried over, but the cut-off set on Indian photos was too strict here. Testing our own fix after seeing this: re-setting the cut-off on about 200 labelled photos from 50 other patients of these hospitals gave 92.8% sensitivity and 74.1% specificity on the validation photos, and false all-clears fell from 46 to 7 (appendix).
-- **Worse photos (stress test):** sensitivity on the DeepDRiD validation photos fell from 55.0% to 10.6% (blur, strong), yet with the quality check false all-clears stayed at 51 or fewer (46 on the originals), against up to 161 without it; strong compression instead cut specificity to 35.9% (appendix).
+- **External photos:** at the frozen cut-off sensitivity fell to 56.1% though AUC stayed 0.911: the ranking carried over, the cut-off did not. Re-set on about 200 local labelled photos, it gave 92.8% sensitivity and 74.1% specificity (post-hoc; appendix).
+- **v2, more cameras (pre-registered):** adding 12,522 photos from 147 hospitals raised DeepDRiD sensitivity to 94.9% (false all-clears 46 → 3) but cut specificity to 78.2%, with 81 near-copies of DeepDRiD photos among them: it failed 2 of 5 pre-set tests, so v1 stays the demo model (appendix).
+- **Worse photos (stress test):** on external photos sensitivity fell to 10.6% at worst (blur, strong), yet with the quality check false all-clears stayed at 51 or fewer, against up to 161 without it; strong compression cut specificity to 35.9% (appendix).
 - **Where it fails:** [TEAM_TO_WRITE(where_it_fails): two missed eyes from results/missed_external.png (or the team-only APTOS gallery) and the reason you see in each, e.g. blur, small lesions near the edge, or a grade you would dispute]
 - **What we learned:** [TEAM_TO_WRITE(what_we_learned): two or three sentences on what surprised you, e.g. how the external photos, the poor-quality photos or the stress test changed what you believed, and what you would do differently]
 
@@ -178,6 +179,28 @@ Held-out APTOS test (352 photos, 152 referable) and the external DeepDRiD set:
 | Rescreen (all-clear) | 296 | 142 |
 | Referable eyes given an all-clear | 81 | 46 |
 | Grade 3 to 4 eyes given an all-clear | 13 | 4 |
+
+**v2: more cameras in training (pre-registered).** The plan, the tests and the decision rule were committed to GitHub (`PREREGISTRATION_v2.md`) before v2 was trained. v2 is the same pipeline with the OIA-DDR grading photos (Li et al. 2019; 12,522 gradable photos from 147 hospitals in China, 42 camera models; CC BY-NC-SA 4.0) added to training and validation, split the same near-duplicate-safe way (10,789 / 901 / 832). Its referral cut-off (0.613) was frozen on the combined validation photos. More camera variety closed most of the missed-referral gap on the unseen hospitals but cost specificity, and the hash check found 81 DeepDRiD photos with near-copies among the added photos (removing them changes little). Verdict: it failed 2 of 5 pre-set tests, so v1 stays the demo model. Both OIA-DDR and DeepDRiD are from China, so neither model is shown to work in Pakistan. Files: `results_v2/`, `Roshni_v2_OIA-DDR.ipynb`.
+
+|  | v1 (APTOS only) | v2 (APTOS + OIA-DDR) |
+|---|---|---|
+| DeepDRiD, all 1,600 photos: sensitivity | 56.1% | 94.9% |
+| DeepDRiD: specificity | 97.2% | 78.2% |
+| DeepDRiD: AUC | 0.911 | 0.950 |
+| DeepDRiD without the 81 near-copies: sensitivity / specificity | (none removed) | 94.9% / 77.5% |
+| APTOS test (352): AUC | 0.978 | 0.975 |
+| APTOS test: sensitivity / specificity | 84.2% / 94.0% | 92.1% / 90.5% |
+| 400-photo workflow: refer / retake / rescreen | 104 / 154 / 142 | 222 / 94 / 84 |
+| 400-photo workflow: referable eyes given an all-clear (severe or proliferative) | 46 (4) | 3 (1) |
+| OIA-DDR test (832; same hospitals as its training photos): AUC, sensitivity / specificity | not tested | 0.977, 87.9% / 95.9% |
+
+| Pre-registered test | v2 | Result |
+|---|---|---|
+| DeepDRiD sensitivity at least 66.1% | 94.9% | pass |
+| DeepDRiD specificity at least 85.0% | 78.2% | **fail** |
+| APTOS test AUC at least 0.950 | 0.975 | pass |
+| At most 46 referable eyes given an all-clear (400-photo workflow) | 3 | pass |
+| Fewer than 16 DeepDRiD photos with a near-copy in the added photos | 81 | **fail** |
 
 **Re-setting the cut-off locally (added after seeing the external result; the frozen results above stay the main ones).** We drew a "clinic sample" of DeepDRiD training patients (whole patients, all their photos), set the referral cut-off for 90% sensitivity on it with the same function used to freeze the original, and scored the full workflow on the 400 validation photos from 100 other patients; the grading model never saw any DeepDRiD photo. Over 500 random samples of 50 patients: sensitivity 92.8% (10th to 90th percentile 87.2% to 96.7%) instead of 55.0%, specificity 74.1% (63.6% to 85.9%) instead of 97.7%; referable eyes given an all-clear 7 instead of 46 (severe or proliferative: 1), at the cost of 224 referrals instead of 104. The same hospitals supply both sets, so this shows the procedure works, not that one cut-off fits every clinic. See `results/local_calibration.png` and `local_calibration.py`.
 

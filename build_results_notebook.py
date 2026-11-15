@@ -200,6 +200,28 @@ cells = [
          "    print('Same decision as the saved run:', int((dec == v.decision.values).sum()), 'of', len(v))\n"
          "    diff = v.assign(now=dec, now_ref=pr.round(3), now_poor=pp.round(3))[dec != v.decision.values]\n"
          "    if len(diff): print('Different (each sits next to a cut-off; small numeric differences between the Kaggle GPU run and this CPU decide it):'); display(diff[['image_id', 'decision', 'now', 'p_referable', 'now_ref', 'p_poor', 'now_poor']].round(3))"),
+    md("## 7. v2: more cameras in training (pre-registered)\n"
+       "`PREREGISTRATION_v2.md` was committed to GitHub before v2 was trained. Here the five pre-set tests are recomputed from v2's "
+       "per-photo predictions in `results_v2/`, not taken from its summary file."),
+    code("if os.path.exists('results_v2/results.json'):\n"
+         "    r2 = json.load(open('results_v2/results.json')); T2, P2 = r2['frozen']['ref_threshold'], r2['frozen']['poor_threshold']\n"
+         "    d2 = pd.read_csv('results_v2/deepdrid_predictions.csv'); g2 = d2[d2.grade <= 4]\n"
+         "    y2, p2 = (g2.grade >= 2).values, (g2.p_referable >= T2).values\n"
+         "    sens2, spec2 = (p2 & y2).sum() / y2.sum(), (~p2 & ~y2).sum() / (~y2).sum()\n"
+         "    v2v = g2[g2.part == 'validation']\n"
+         "    dec2 = np.where(v2v.p_referable >= T2, 'REFER', np.where(v2v.p_poor >= P2, 'RETAKE', 'RESCREEN'))\n"
+         "    fac2 = int(((dec2 == 'RESCREEN') & (v2v.grade >= 2)).sum())\n"
+         "    a2 = pd.read_csv('results_v2/aptos_test_predictions.csv'); auc2 = roc_auc_score(a2.grade >= 2, a2.p_referable)\n"
+         "    nc2 = int(d2.near_copy_in_training.sum())\n"
+         "    tests = [('DeepDRiD sensitivity >= 66.1%', f'{sens2:.1%}', sens2 >= 0.661), ('DeepDRiD specificity >= 85.0%', f'{spec2:.1%}', spec2 >= 0.85),\n"
+         "             ('APTOS test AUC >= 0.950', f'{auc2:.3f}', auc2 >= 0.95), ('false all-clears (400-photo workflow) <= 46', str(fac2), fac2 <= 46),\n"
+         "             ('fewer than 16 DeepDRiD near-copies in the added photos', str(nc2), nc2 < 16)]\n"
+         "    display(pd.DataFrame(tests, columns=['pre-registered test', 'v2', 'passed']))\n"
+         "    print('Verdict:', 'v2 replaces v1' if all(t[2] for t in tests) else 'v1 stays the demo model; v2 is reported in full')\n"
+         "    print(f'For comparison, v1 on the same DeepDRiD photos: sensitivity {res[\"results\"][\"external_all\"][\"sensitivity\"]:.1%}, '\n"
+         "          f'specificity {res[\"results\"][\"external_all\"][\"specificity\"]:.1%}')\n"
+         "else:\n"
+         "    print('results_v2/ not found')"),
     md("## Where it fails\nReferable eyes given an all-clear on the external photos (lowest scores first). "
        "Our reading of them is in the README's Results section."),
     code("display(Show('results/missed_external.png', width=1000))"),

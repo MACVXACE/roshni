@@ -1,0 +1,9 @@
+model,n,referable,AUC,sensitivity,specificity,PPV,NPV,missed_FN,false_alarms_FP,referred_share
+Colour histogram + logistic regression,352,152,0.710,0.934,0.245,0.485,0.831,10,151,0.832
+"Pretrained features, not fine-tuned + logistic regression",352,152,0.955,0.901,0.890,0.862,0.922,15,22,0.452
+Fine-tuned efficientnet_b0,352,152,0.975,0.921,0.905,0.881,0.938,12,19,0.452
+"Fine-tuned, OIA-DDR test (China)",832,462,0.977,0.879,0.959,0.964,0.864,56,15,0.506
+"Fine-tuned, external DeepDRiD (China)",1600,700,0.950,0.949,0.782,0.772,0.951,36,196,0.537
+"External DeepDRiD, near-copies of training photos removed",1519,683,0.948,0.949,0.775,0.775,0.949,35,188,0.550
+"External, good-quality photos",758,356,0.965,0.952,0.813,0.819,0.951,17,75,0.546
+"External, poor-quality photos",842,344,0.937,0.945,0.757,0.729,0.952,19,121,0.530
