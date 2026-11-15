@@ -12,7 +12,7 @@ HOW THIS FILE WORKS
 ## problem
 <!-- OWNER: Zainab. OPTIONAL: replaces our default "The problem" text. Official template: 2-3 sentences. Limit 80 words.
 Use only facts from the context file Part 4 or Addendum 2, or a new source you add under "Sources" below. -->
-Pakistan has the world's highest diabetes prevalence: 31.4% of adults, about 34.5 million people, and in Pakistani studies about 29% of people with diabetes had diabetic retinopathy (9% sight-threatening). It is treatable if caught early, but screening is concentrated in eye hospitals: Pakistan has about 15 ophthalmologists per million people, mostly in cities. Travel is costly and harder for women, and in one clinic study over 70% of long-standing diabetes patients had never had a retinal check.
+Pakistan has the world's highest diabetes prevalence: 31.4% of adults, about 34.5 million people, and a 2018 review of Pakistani studies found about 29% of people with diabetes had diabetic retinopathy (9% sight-threatening). It is treatable if caught early, but screening is concentrated in eye hospitals: Pakistan has about 15 ophthalmologists per million, mostly in cities. Travel is costly and harder for women, and in one clinic study over 70% of long-standing diabetes patients had never had a retinal check.
 
 ## next_steps
 <!-- OWNER: Zainab. OPTIONAL: replaces our two default next steps. One or two concrete steps. Limit 60 words. -->
@@ -43,7 +43,7 @@ tiny lesions hidden by shadows, glare, and camera shifts
 ## ai_tools
 <!-- OWNER: everyone. REQUIRED (rules: cite every AI tool). List every assistant each of you used and what for,
 e.g. "Claude (Anthropic): code, research checks and write-up drafting; ChatGPT (OpenAI): ..." -->
-Claude (Anthropic), https://claude.ai: code, experiment design, research checks and write-up drafting (Varun), and help for Laziza and Zainab; Claude Fable 5.2 (Anthropic), https://claude.ai: redesign of the demo page (Zainab); ChatGPT (OpenAI), https://chatgpt.com: used by Laziza and Zainab; Gemini (Google), https://gemini.google.com, through the Argon assistant: brief brainstorming (Varun)
+Claude (Anthropic), https://claude.ai: code, experiment design, research checks and write-up drafting (Varun), demo-page work (Zainab) and help for Laziza; Claude Fable 5.2 (Anthropic), https://claude.ai: redesign of the demo page (Zainab); ChatGPT (OpenAI), https://chatgpt.com: background research on the problem (Zainab) and help for Laziza; Gemini (Google), https://gemini.google.com, through the Argon assistant: brief brainstorming (Varun)
 
 ## demo_link
 <!-- OWNER: Varun. REQUIRED. The GitHub Pages link to the browser demo, e.g. https://USERNAME.github.io/roshni/web/ -->

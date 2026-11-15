@@ -13,11 +13,11 @@
 <!-- Generated from README.template.md by fill_report.py. Edit the template, not this file. Numbers come only from results/. -->
 
 ## The problem
-<!-- team:problem -->Pakistan has the world's highest diabetes prevalence: 31.4% of adults, about 34.5 million people, and in Pakistani studies about 29% of people with diabetes had diabetic retinopathy (9% sight-threatening). It is treatable if caught early, but Pakistan has about 15 ophthalmologists per million people, mostly in cities (high-income countries: 76). Screening is not available at primary level, travel to city hospitals is costly and harder for women, and surveyed eye hospitals had no screening policy.<!-- /team:problem -->
+<!-- team:problem -->Pakistan has the world's highest diabetes prevalence: 31.4% of adults, about 34.5 million people, and a 2018 review of Pakistani studies found about 29% of people with diabetes had diabetic retinopathy (9% sight-threatening). It is treatable if caught early, but Pakistan has about 15 ophthalmologists per million, mostly in cities (high-income countries: 76). Screening is not available at primary level, travel to city hospitals is costly and harder for women, and surveyed eye hospitals had no screening policy.<!-- /team:problem -->
 
 ## What we built
 **User:** a doctor or nurse in a Pakistani primary-care diabetes clinic with a retinal camera but no eye specialist. **In:** one retinal photo. **Out:** one next step for the doctor to confirm: **REFER** (moderate or worse, grade 2 to 4), **RETAKE** (too unclear to rule disease out) or **RESCREEN** in 12 months.
-**Safety rule:** a photo judged too poor to read gets a retake instead of an all-clear, and never blocks a referral. It also shows the estimated grade, a heat map and a note in English and Urdu.
+**Safety rule:** a photo judged too poor to read gets a retake instead of an all-clear, and never blocks a referral. It also shows the estimated grade, a heat map and an English and Urdu note.
 
 ## What we added
 Our own idea (track 4.1.4).
@@ -28,7 +28,7 @@ Our own idea (track 4.1.4).
 - **New source:** trained on rural India (APTOS 2019), tested once on unseen Chinese hospital photos (DeepDRiD).
 
 ## How it works
-- **Data:** APTOS 2019, 3,662 photos graded 0 to 4 (Aravind Eye Hospital, India), split by grade into [FROM_RESULTS_JSON: derived.split_counts], with [FROM_RESULTS_JSON: duplicates.pairs | int] near-duplicate pairs kept on one side of the split. External: [FROM_RESULTS_JSON: derived.ext_photos | int] DeepDRiD photos from [FROM_RESULTS_JSON: derived.ext_patients | int] patients with expert quality labels.
+- **Data:** APTOS 2019, 3,662 photos graded 0 to 4 (Aravind Eye Hospital, India), split by grade into [FROM_RESULTS_JSON: derived.split_counts], with [FROM_RESULTS_JSON: duplicates.pairs | int] near-duplicate pairs kept on one side of the split. External: [FROM_RESULTS_JSON: derived.ext_photos | int] DeepDRiD photos from [FROM_RESULTS_JSON: derived.ext_patients | int] patients with quality labels.
 - **Model:** EfficientNet-B0 (ImageNet weights), fine-tuned for [FROM_RESULTS_JSON: derived.epochs_run | int] epochs at [FROM_RESULTS_JSON: frozen.size | int] px; referable score = probability of grade 2 or worse.
 - **Frozen before testing:** the referral threshold ([FROM_RESULTS_JSON: frozen.ref_threshold | .3f]) was set for [FROM_RESULTS_JSON: frozen.target_sensitivity | pct0] sensitivity on validation; the quality check (logistic regression on image features, cut-off [FROM_RESULTS_JSON: frozen.poor_threshold | .2f]) was trained only on DeepDRiD's 1,200 training photos.
 - **Baselines:** colour histogram, and untuned pretrained features, each + logistic regression, thresholded the same way.
@@ -54,6 +54,7 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 ## Sources
 - IDF Diabetes Atlas, Pakistan: https://diabetesatlas.org/data-by-location/country/pakistan
 - Mumtaz et al. 2018, diabetic retinopathy in Pakistan, systematic review: https://pjms.com.pk/index.php/pjms/article/view/13819
+- Akhtar et al. 2026, diabetic retinopathy in type 2 diabetes in Pakistan, systematic review and meta-analysis (Front Clin Diabetes Healthc; pooled prevalence 32.9%, 60 studies): https://pubmed.ncbi.nlm.nih.gov/41982556/
 - Ophthalmologists per million in Pakistan (The News, 2026): https://www.thenews.pk/print/1422954-rising-cataract-burden-outpaces-pakistan-s-healthcare-capacity
 - Sightsavers 2021, diabetic retinopathy services in Pakistan (primary level, cities, barriers for women): https://www.sightsavers.org/blogs/2021/06/diabetic-retinopathy-in-pakistan
 - Shah et al. 2019, screening policy in Pakistani eye hospitals: https://www.ijo.cn/gjyken/article/pdf/20190517
