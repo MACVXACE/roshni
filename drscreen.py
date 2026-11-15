@@ -506,7 +506,7 @@ def gradcam_map(model, pil_img, size=384, device=None):
 # then set checked=True. Nothing else in the code changes.
 LANGS = {
     "en": dict(name="English", dir="ltr", reviewer="whole team", checked=True),
-    "ur": dict(name="اردو", dir="rtl", reviewer="Zainab", checked=False),   # set True after Zainab's check (task Z2)
+    "ur": dict(name="اردو", dir="rtl", reviewer="Zainab", checked=True),    # reviewed and corrected by Zainab, 15 Nov 2026
     "hi": dict(name="हिन्दी", dir="ltr", reviewer="Varun", checked=False),   # hidden until Varun checks it
 }
 # Shown by default for the Pakistan clinic setting.
@@ -523,22 +523,22 @@ REPORT = {
     "REFER": {
         "en": "Referable diabetic retinopathy suspected (moderate or worse). Recommended next step, for the doctor to confirm: refer to an eye specialist.",
         "hi": "मधुमेह से आँख के पर्दे (रेटिना) की मध्यम या उससे गंभीर बीमारी (डायबिटिक रेटिनोपैथी) की आशंका है। अनुशंसित अगला कदम, डॉक्टर की पुष्टि के बाद: नेत्र विशेषज्ञ के पास भेजें।",
-        "ur": "ذیابیطس کی وجہ سے آنکھ کے پردے (ریٹینا) کی درمیانی یا زیادہ بیماری کا شبہ ہے۔ تجویز کردہ اگلا قدم، ڈاکٹر کی تصدیق کے بعد: آنکھوں کے ماہر کے پاس بھیجیں۔",
+        "ur": "ذیابیطس کے باعث آنکھ کے پردے (ریٹینا) میں درمیانی یا شدید درجے کی بیماری کا شبہ ہے۔ ڈاکٹر کی تصدیق کے بعد، اگلا قدم: مریض کو آنکھوں کے ماہر کے پاس بھیجیں۔",
     },
     "RETAKE": {
         "en": "The photo is not clear enough to rule out disease. Recommended next step: retake the photo; if it is still unclear, refer to an eye specialist.",
         "hi": "तस्वीर इतनी साफ़ नहीं है कि बीमारी को नकारा जा सके। अनुशंसित अगला कदम: तस्वीर दोबारा लें; अगर फिर भी साफ़ न हो, तो नेत्र विशेषज्ञ के पास भेजें।",
-        "ur": "تصویر اتنی واضح نہیں کہ بیماری کو رد کیا جا سکے۔ تجویز کردہ اگلا قدم: تصویر دوبارہ لیں؛ اگر پھر بھی واضح نہ ہو تو آنکھوں کے ماہر کے پاس بھیجیں۔",
+        "ur": "تصویر اتنی واضح نہیں کہ بیماری کی موجودگی یا عدم موجودگی کا قابلِ اعتماد اندازہ لگایا جا سکے۔ اگلا قدم: تصویر دوبارہ لیں۔ اگر دوسری تصویر بھی واضح نہ ہو تو مریض کو آنکھوں کے ماہر کے پاس بھیجیں۔",
     },
     "RESCREEN": {
-        "en": "No referable diabetic retinopathy seen on this photo. Recommended next step: routine eye screening again in 12 months.",
+        "en": "No referable diabetic retinopathy was detected on this photo; this does not rule out eye disease. Recommended next step: continue routine eye check-ups as the doctor advises (usually every 12 months).",
         "hi": "इस तस्वीर में ऐसी डायबिटिक रेटिनोपैथी नहीं दिखी जिसके लिए विशेषज्ञ के पास भेजना ज़रूरी हो। अनुशंसित अगला कदम: 12 महीने बाद फिर से नियमित आँखों की जाँच।",
-        "ur": "اس تصویر میں ریفر کرنے کے قابل ذیابیطس کی آنکھ کی بیماری نظر نہیں آئی۔ تجویز کردہ اگلا قدم: 12 ماہ بعد دوبارہ معمول کا معائنہ۔",
+        "ur": "اس تصویر میں ذیابیطس سے متعلق ایسی آنکھ کی بیماری کی نشاندہی نہیں ہوئی جس پر ریفرل کی حد پوری ہوتی ہو۔ اگلا قدم: ڈاکٹر کی ہدایت کے مطابق معمول کے معائنے جاری رکھیں۔",
     },
     "DISCLAIMER": {
         "en": "Prototype for a student hackathon. Not medical advice and not a diagnosis.",
         "hi": "यह छात्रों के हैकाथॉन का एक प्रोटोटाइप है। यह चिकित्सीय सलाह या निदान नहीं है।",
-        "ur": "یہ طلبہ کے ہیکاتھون کا تجرباتی نمونہ ہے۔ یہ طبی مشورہ یا تشخیص نہیں ہے۔",
+        "ur": "یہ طلبہ کے ہیکاتھون کے لیے تیار کیا گیا ایک تجرباتی نمونہ ہے۔ یہ طبی مشورہ یا حتمی تشخیص فراہم نہیں کرتا۔",
     },
 }
 

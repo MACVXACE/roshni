@@ -22,6 +22,7 @@
   .panel h2 { font-size:1rem; margin:0 0 10px; }
   label.pick { display:block; border:2px dashed var(--line); border-radius:10px; padding:18px; text-align:center; cursor:pointer; background:var(--bg); }
   label.pick:hover { border-color:var(--accent); }
+  label.pick:has(input:disabled) { opacity:.55; cursor:wait; }   /* greyed out until the model has loaded */
   #file { display:block; margin:8px auto 0; }
   #status { color:var(--muted); font-size:.9rem; min-height:1.4em; margin:10px 0; }
   #langs label { margin-right:14px; font-size:.95rem; white-space:nowrap; }
@@ -57,7 +58,7 @@
   <div class="grid">
     <section class="panel">
       <h2>1. Choose a retinal photo</h2>
-      <label class="pick">Tap to take or choose a fundus photo
+      <label class="pick">Tap to choose a fundus photo (from the fundus camera or your files)
         <input id="file" type="file" accept="image/*" disabled>
       </label>
       <div id="status">Loading…</div>

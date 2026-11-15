@@ -1,7 +1,7 @@
 /* Roshni offline support: after the first visit, the page, the model and ONNX Runtime are kept on the device,
    so screening works with no internet. VERSION is rewritten by export_web.py from the model's hash, so a new
    model replaces the old cache in one step (model and thresholds always change together). */
-const VERSION = "roshni-18cf4ccdbe47";
+const VERSION = "roshni-5400db079135";
 const CORE = ["./", "index.html", "roshni.js", "roshni_web.json", "model.onnx", "manifest.json",
               "icons/icon-192.png", "icons/icon-512.png",
               "ort/ort.wasm.min.js", "ort/ort-wasm-simd-threaded.mjs", "ort/ort-wasm-simd-threaded.wasm"];

@@ -166,7 +166,7 @@ def record_demo(web_dir, tmp, chrome, ort_dir, seconds=60):
         pg = ctx.new_page()
         pg.goto("http://127.0.0.1:8766/index.html")
         pg.wait_for_function("document.getElementById('status').textContent.startsWith('Ready')", timeout=60000)
-        pg.wait_for_timeout(2500)
+        pg.wait_for_timeout(9000)   # the opening sentences of the voice-over play over the start screen
         caps = [e["caption"] for e in cfg.get("examples", [])]
 
         def show(match, hold):
@@ -190,9 +190,7 @@ def record_demo(web_dir, tmp, chrome, ort_dir, seconds=60):
         used += show(lambda c: "poor" in c and ("grade 0" in c or "grade 1" in c), 9000)  # poor photo: retake
         used += show(lambda c: "poor" in c and ("grade 2" in c or "grade 3" in c or "grade 4" in c), 9000)  # poor + disease
         pg.locator("#notebox").evaluate("e => e.scrollIntoView({behavior: 'smooth', block: 'start'})")
-        pg.wait_for_timeout(8000)                                                    # the Urdu note
-        pg.evaluate("window.scrollTo({top: 0, behavior: 'smooth'})")
-        pg.wait_for_timeout(4000)
+        pg.wait_for_timeout(10000)                                                   # the Urdu note, to the end of the part
         path = pg.video.path()
         ctx.close()
         b.close()
@@ -257,7 +255,20 @@ def main():
             v = next((os.path.join(x.voice_dir, f) for f in sorted(os.listdir(x.voice_dir)) if f.startswith(name + ".")), None)
         out = os.path.join(tmp, f"{name}_av.mp4")
         if v:
-            run(["ffmpeg", "-y", "-i", seg[name], "-i", v, "-filter_complex", f"[1:a]apad,atrim=0:{sec}[a]", "-map", "0:v",
+            # trim silence at both ends; if the take is still a little long, speed it up slightly (at most 1.2x) to fit
+            trim = ("silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
+                    "silenceremove=start_periods=1:start_threshold=-45dB,areverse")
+            tv = os.path.join(tmp, f"{name}_trim.wav")
+            run(["ffmpeg", "-y", "-i", v, "-af", trim, "-ac", "2", "-ar", "48000", tv])
+            vlen = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", tv],
+                                        capture_output=True, text=True).stdout.strip())
+            tempo = max(1.0, vlen / (sec - 0.3))
+            if tempo > 1.2:
+                print(f"WARNING: {name} voice is {vlen:.1f} s for a {sec} s slot; it will be cut. Re-record faster or shorter.")
+                tempo = 1.2
+            print(f"voice {name}: {vlen:.1f} s for {sec} s slot, tempo {tempo:.2f}")
+            run(["ffmpeg", "-y", "-i", seg[name], "-i", tv, "-filter_complex",
+                 f"[1:a]atempo={tempo:.3f},adelay=150|150,apad,atrim=0:{sec}[a]", "-map", "0:v",
                  "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-t", str(sec), out])
         else:
             run(["ffmpeg", "-y", "-i", seg[name], "-f", "lavfi", "-t", str(sec), "-i", "anullsrc=r=48000:cl=stereo",

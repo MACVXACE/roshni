@@ -86,7 +86,8 @@ def test_reports_exist_in_every_language():
         assert v["reviewer"] and isinstance(v["checked"], bool) and v["dir"] in ("ltr", "rtl")
     # unchecked languages are hidden unless they are a default (defaults are enforced by check_submission.py)
     assert set(ds.shown_langs()) == {c for c, v in ds.LANGS.items() if v["checked"]} | set(ds.DEFAULT_LANGS)
-    assert all("12" in ds.REPORT["RESCREEN"][c] for c in ds.LANGS)
+    assert "12" in ds.REPORT["RESCREEN"]["en"]       # the usual interval; the Urdu note defers to the doctor (Zainab's wording)
+    assert "ڈاکٹر" in ds.REPORT["RESCREEN"]["ur"]
 
 
 def test_fill_report_formats_and_refuses_gaps():
