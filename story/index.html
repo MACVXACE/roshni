@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roshni · The story</title>
+<meta name="description" content="Roshni: an open, offline diabetic-retinopathy triage prototype for primary care in Pakistan. A research prototype, not a medical device.">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" href="../web/icons/icon-192.png">
+<style>
+  /* Roshni story page. Self-contained: no libraries, fonts or outside files.
+     It does not touch the demo in ../web/, its tests or the video. */
+  :root {
+    --bg:#06080b; --ink:#f3f1ec; --ink2:#c7cbd1; --muted:#8e959e; --line:rgba(255,255,255,.12);
+    --light:#f2c27a; --teal:#5fb8ae; --refer:#ff7d6e; --retake:#ffbe5c; --rescreen:#6fd3c4;
+    --ring:var(--light);
+    --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  * { box-sizing:border-box; }
+  html { background:var(--bg); }
+  body { margin:0; color:var(--ink); font:16px/1.6 var(--sans); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; }
+  :focus-visible { outline:2px solid var(--light); outline-offset:3px; }
+
+  /* fixed cinematic stage */
+  #stage { position:fixed; inset:0; z-index:0; overflow:hidden; background:var(--bg); }
+  #iris { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .ph { position:absolute; left:50%; top:50%; width:min(64vh,80vw,620px); aspect-ratio:1; transform:translate(-50%,-50%); opacity:0; will-change:transform,opacity,filter; }
+  .ph img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:50%; opacity:0; transition:opacity .9s ease; background:#000; }
+  .ph img.on { opacity:1; }
+  .ph::after { content:""; position:absolute; inset:-1px; border-radius:50%; box-shadow:inset 0 0 60px 20px rgba(6,8,11,.85); pointer-events:none; }
+  .hud { position:absolute; inset:-9%; pointer-events:none; animation:spin 90s linear infinite; }
+  .hud circle { fill:none; stroke:var(--ring); transition:stroke .8s ease; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .scrim { position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 50%, transparent 40%, rgba(6,8,11,.75) 100%), linear-gradient(90deg, rgba(6,8,11,.92) 0%, rgba(6,8,11,.55) 38%, transparent 62%); opacity:0; transition:opacity .6s; }
+  body.reading .scrim { opacity:1; }
+  .grain { position:absolute; inset:-50%; opacity:.06; pointer-events:none; background-image:radial-gradient(rgba(255,255,255,.9) .6px, transparent .7px); background-size:3px 3px; }
+
+  /* chrome */
+  header.bar { position:fixed; top:0; inset-inline:0; z-index:10; display:flex; justify-content:space-between; align-items:center; padding:20px 28px; mix-blend-mode:normal; }
+  .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .logo i { width:22px; height:22px; border-radius:50%; border:1.5px solid var(--light); position:relative; }
+  .logo i::after { content:""; position:absolute; inset:6px; border-radius:50%; background:var(--light); box-shadow:0 0 14px var(--light); }
+  .logo b { font-family:var(--serif); font-size:1.15rem; font-weight:500; letter-spacing:.02em; }
+  .pill { font-size:.8rem; text-decoration:none; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:rgba(6,8,11,.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+  .pill:hover { border-color:var(--light); }
+  .progress { position:fixed; top:0; left:0; height:2px; width:100%; transform-origin:0 0; transform:scaleX(0); background:linear-gradient(90deg,var(--light),var(--teal)); z-index:11; }
+  .chap { position:fixed; right:28px; bottom:24px; z-index:10; font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); display:flex; gap:12px; align-items:center; }
+  .chap span { color:var(--ink); }
+  .chap::before { content:""; width:28px; height:1px; background:var(--muted); }
+
+  /* story content */
+  main { position:relative; z-index:2; }
+  section { position:relative; min-height:100vh; display:flex; align-items:center; padding:120px 28px; }
+  .hero { height:260vh; align-items:flex-start; padding:0; }
+  .hero .sticky { position:sticky; top:0; height:100vh; width:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:0 28px 92px; }
+  .hero h1 { text-shadow:0 2px 30px rgba(6,8,11,.85); font-family:var(--serif); font-weight:400; font-size:clamp(3.6rem,12vw,10.5rem); line-height:.88; letter-spacing:-.03em; margin:0; }
+  .hero h1 em { font-style:italic; color:var(--light); }
+  .hero .sub { max-width:520px; color:var(--ink2); font-size:1.05rem; margin:22px 0 0; }
+  .hero .ur { font-family:"Noto Nastaliq Urdu","Jameel Noori Nastaleeq","Noto Naskh Arabic",serif; color:var(--light); font-size:1.25rem; margin-top:10px; }
+  .stats { display:flex; flex-wrap:wrap; gap:28px 56px; margin-top:44px; border-top:1px solid var(--line); padding-top:18px; max-width:980px; }
+  .stats div { min-width:150px; }
+  .stats b { display:block; font-family:var(--serif); font-weight:400; font-size:clamp(1.6rem,3vw,2.3rem); line-height:1; }
+  .stats small { display:block; color:var(--muted); font-size:.78rem; margin-top:6px; max-width:200px; }
+  .cue { position:absolute; right:28px; bottom:150px; font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); writing-mode:vertical-rl; }
+  .cue::after { content:""; display:inline-block; width:1px; height:48px; background:linear-gradient(var(--muted),transparent); margin-top:10px; }
+
+  .card { max-width:520px; opacity:0; transform:translateY(28px); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .card.in { opacity:1; transform:none; }
+  .eyebrow { font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; color:var(--light); margin:0 0 18px; display:flex; gap:12px; align-items:center; }
+  .eyebrow::before { content:""; width:28px; height:1px; background:var(--light); }
+  h2 { font-family:var(--serif); font-weight:400; font-size:clamp(2.2rem,5.4vw,4.2rem); line-height:1; letter-spacing:-.02em; margin:0 0 22px; }
+  h2 em { font-style:italic; color:var(--light); }
+  .card p { color:var(--ink2); margin:0 0 14px; font-size:1.04rem; }
+  .src { font-size:.72rem; color:var(--muted); }
+  .src a { color:var(--muted); }
+
+  .tag { display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.18em; padding:5px 10px; border-radius:4px; color:#06080b; margin-bottom:16px; }
+  .t-refer { background:var(--refer); } .t-retake { background:var(--retake); } .t-rescreen { background:var(--rescreen); }
+  .shot { font-size:.78rem; color:var(--muted); border-top:1px solid var(--line); padding-top:12px; margin-top:20px; }
+  .shot b { color:var(--ink); font-weight:600; }
+
+  .steps { counter-reset:s; list-style:none; padding:0; margin:26px 0 0; display:grid; gap:14px; }
+  .steps li { counter-increment:s; display:grid; grid-template-columns:44px 1fr; gap:14px; align-items:baseline; border-top:1px solid var(--line); padding-top:14px; color:var(--ink2); }
+  .steps li::before { content:"0" counter(s); font-family:var(--serif); font-size:1.4rem; color:var(--light); }
+  .steps b { color:var(--ink); font-weight:600; display:block; }
+
+  .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-top:28px; max-width:760px; }
+  .grid > div { background:rgba(6,8,11,.82); padding:22px; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+  .grid b { display:block; font-family:var(--serif); font-weight:400; font-size:clamp(2rem,4vw,3rem); line-height:1; }
+  .grid b small { font-size:.45em; color:var(--muted); }
+  .grid > div > span { display:block; color:var(--ink2); font-size:.86rem; margin-top:10px; }
+  .grid b span { display:inline; }
+  .grid .warn b { color:var(--retake); }
+  .wide { max-width:760px; }
+  .lims { list-style:none; padding:0; margin:22px 0 0; }
+  .lims li { border-top:1px solid var(--line); padding:12px 0; color:var(--ink2); }
+  .lims li:last-child { border-bottom:1px solid var(--line); }
+
+  .end { justify-content:center; text-align:center; }
+  .end .card { max-width:760px; }
+  .end h2 { font-size:clamp(2.6rem,8vw,6.5rem); }
+  .cta { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:30px; }
+  .btn { text-decoration:none; padding:15px 26px; border-radius:999px; font-weight:600; font-size:.95rem; border:1px solid var(--line); }
+  .btn.main { background:var(--ink); color:#06080b; border-color:var(--ink); }
+  .btn.main:hover { background:var(--light); border-color:var(--light); }
+  .btn:not(.main):hover { border-color:var(--light); }
+  .disc { margin:34px auto 0; font-size:.82rem; color:var(--muted); max-width:620px; }
+  footer { position:relative; z-index:2; padding:30px 28px 60px; font-size:.74rem; color:var(--muted); border-top:1px solid var(--line); background:rgba(6,8,11,.9); }
+  footer p { margin:6px 0; max-width:980px; }
+
+  @media (min-width: 900px) {
+    section.right { justify-content:flex-start; }
+  }
+  @media (max-width: 899px) {
+    section { padding:96px 20px; align-items:flex-end; }
+    .hero .sticky { padding:0 20px 80px; }
+    .ph { width:min(78vw,52vh); top:34%; }
+    .scrim { background:linear-gradient(180deg, transparent 20%, rgba(6,8,11,.94) 62%); }
+    .card { background:rgba(6,8,11,.72); padding:22px; border-radius:16px; border:1px solid var(--line); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+    .cue { display:none; }
+    .chap { display:none; }
+    .grid { grid-template-columns:1fr; }
+    header.bar { padding:14px 20px; background:linear-gradient(rgba(6,8,11,.95),rgba(6,8,11,0)); }
+    .hero h1 { font-size:clamp(3rem,15vw,4.4rem); }
+    .stats { gap:14px 22px; margin-top:24px; }
+    .stats div { min-width:0; flex:1 1 28%; }
+    .stats small { font-size:.7rem; }
+    .hero .sub { font-size:.98rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card { opacity:1; transform:none; transition:none; }
+    .hud { animation:none; }
+    .ph img { transition:none; }
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div id="stage" aria-hidden="true">
+  <canvas id="iris"></canvas>
+  <div class="ph" id="ph">
+    <svg class="hud" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="49" stroke-width=".15" opacity=".6"/>
+      <circle cx="50" cy="50" r="46.5" stroke-width=".35" stroke-dasharray=".6 2.2" opacity=".9"/>
+      <circle cx="50" cy="50" r="44.2" stroke-width=".12" stroke-dasharray="20 6 2 6" opacity=".5"/>
+    </svg>
+    <img data-k="calm" src="../web/examples/410_l1.jpg" alt="">
+    <img data-k="refer" src="../web/examples/267_r2.jpg" alt="">
+    <img data-k="retake" src="../web/examples/322_r1.jpg" alt="">
+    <img data-k="missed" src="../web/examples/381_l2.jpg" alt="">
+  </div>
+  <div class="scrim"></div>
+  <div class="grain"></div>
+</div>
+
+<header class="bar">
+  <a class="logo" href="#top" aria-label="Roshni, back to top"><i></i><b>Roshni</b></a>
+  <a class="pill" href="../web/">Open the live demo →</a>
+</header>
+<div class="chap" aria-hidden="true"><span id="chapNum">01</span><em id="chapName" style="font-style:normal">Prologue</em></div>
+
+<main id="top">
+  <section class="hero" data-scene="iris" data-name="Prologue">
+    <div class="sticky">
+      <h1>Roshni<br><em>light</em> for the eyes</h1>
+      <p class="ur" lang="ur" dir="rtl">روشنی · آنکھوں کے لیے</p>
+      <p class="sub">An open, offline triage prototype for diabetic eye disease, built for primary-care clinics in Pakistan that have a retinal camera but no eye specialist.</p>
+      <div class="stats">
+        <div><b>34.5M</b><small>adults with diabetes in Pakistan</small></div>
+        <div><b>31.4%</b><small>adult diabetes prevalence, the world's highest</small></div>
+        <div><b>~15</b><small>ophthalmologists per million people</small></div>
+      </div>
+      <div class="cue">Scroll</div>
+    </div>
+  </section>
+
+  <section data-scene="calm" data-zoom="1,1.12" data-name="The problem">
+    <div class="card">
+      <p class="eyebrow">01 · The problem</p>
+      <h2>Damage that <em>doesn't hurt</em>, until it's late.</h2>
+      <p>In Pakistani studies, about 29% of people with diabetes had diabetic retinopathy. It is treatable when caught early, but screening sits mostly in eye hospitals, far from where diabetes is treated.</p>
+      <p>In one clinic study, over 70% of long-standing diabetes patients had never had a retinal check.</p>
+      <p class="src">Sources: <a href="https://diabetesatlas.org/data-by-location/country/pakistan">IDF Diabetes Atlas</a> · <a href="https://pjms.com.pk/index.php/pjms/article/view/13819">Mumtaz et al. 2018</a> · <a href="https://pjms.com.pk/index.php/pjms/article/view/10955">Jawa et al. 2016</a> · <a href="https://www.thenews.pk/print/1422954-rising-cataract-burden-outpaces-pakistan-s-healthcare-capacity">The News 2026</a></p>
+    </div>
+  </section>
+
+  <section data-scene="calm" data-zoom="1.12,1.3" data-name="The idea">
+    <div class="card">
+      <p class="eyebrow">02 · The idea</p>
+      <h2>One photo. <em>One next step.</em></h2>
+      <p>Proven AI screeners exist abroad, but they are tied to specific cameras, cloud servers or paid licences. Roshni adapts the same idea into a tool that runs in a web browser, on the device the clinic already has.</p>
+      <p>The photo never leaves the device, and after the first visit it works without internet.</p>
+    </div>
+  </section>
+
+  <section data-scene="refer" data-zoom="1,1.18" data-ring="var(--refer)" data-name="Refer">
+    <div class="card">
+      <span class="tag t-refer">REFER</span>
+      <h2>Referable disease <em>suspected.</em></h2>
+      <p>Moderate or worse diabetic retinopathy may be present. The clinician confirms and refers to an eye specialist.</p>
+      <p class="shot">On screen: expert grade 3 (severe), good photo. <b>Roshni's answer on this photo: Refer.</b></p>
+    </div>
+  </section>
+
+  <section data-scene="retake" data-zoom="1,1.1" data-ring="var(--retake)" data-name="Retake">
+    <div class="card">
+      <span class="tag t-retake">RETAKE</span>
+      <h2>Too unclear to <em>rule disease out.</em></h2>
+      <p>A photo that can't be read is sent for a retake instead of an all-clear, and it never blocks a referral.</p>
+      <p class="shot">On screen: expert grade 0, poor photo. <b>Roshni's answer on this photo: Retake.</b></p>
+    </div>
+  </section>
+
+  <section data-scene="calm" data-zoom="1,1.08" data-ring="var(--rescreen)" data-name="Rescreen">
+    <div class="card">
+      <span class="tag t-rescreen">RESCREEN</span>
+      <h2>Not detected in this <em>gradable</em> photo.</h2>
+      <p>Routine check-ups continue as the doctor advises. This is not a guarantee that the eye is healthy.</p>
+      <p class="shot">On screen: expert grade 0, good photo. <b>Roshni's answer on this photo: Rescreen.</b></p>
+    </div>
+  </section>
+
+  <section data-scene="calm" data-zoom="1.08,1.2" data-name="How it works">
+    <div class="card">
+      <p class="eyebrow">03 · How it works</p>
+      <h2>Four steps, <em>in your browser.</em></h2>
+      <ol class="steps">
+        <li><span><b>Upload</b>One retinal photo from the clinic camera.</span></li>
+        <li><span><b>Check image quality</b>A quality check flags photos too poor to read.</span></li>
+        <li><span><b>Analyse</b>An EfficientNet-B0 model scores referable disease, with a heat map of where it looked.</span></li>
+        <li><span><b>Result</b>Refer, retake or rescreen, with a note in English and Urdu for the doctor to confirm.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section data-scene="refer" data-zoom="1.18,1.3" data-name="What we measured">
+    <div class="card wide">
+      <p class="eyebrow">04 · What we measured</p>
+      <h2>Tested on photos <em>it never saw.</em></h2>
+      <p>The referral cut-off was frozen before testing, then scored once.</p>
+      <div class="grid">
+        <div><b><span data-count="84.2">0</span><small>%</small> / <span data-count="94.0">0</span><small>%</small></b><span>Sensitivity / specificity on 352 held-out photos from India</span></div>
+        <div class="warn"><b><span data-count="56.1">0</span><small>%</small> / <span data-count="97.2">0</span><small>%</small></b><span>On 1,600 photos from Chinese hospitals it never saw: the cut-off did not transfer</span></div>
+        <div><b><span data-count="81" data-dec="0">0</span> → <span data-count="46" data-dec="0">0</span></b><span>Referable photos given an all-clear, among 400 external photos, before vs after the quality check (at the cost of 154 retakes)</span></div>
+        <div><b><span data-count="0.15" data-dec="2">0</span><small> s</small></b><span>Median time per photo on a 2-thread CPU with no graphics card</span></div>
+      </div>
+      <p class="src" style="margin-top:14px">All figures from the project repository's frozen evaluation.</p>
+    </div>
+  </section>
+
+  <section data-scene="missed" data-zoom="1,1.15" data-ring="var(--retake)" data-name="Where it fails">
+    <div class="card">
+      <p class="eyebrow">05 · Where it fails</p>
+      <h2>We show the <em>misses</em> too.</h2>
+      <p>This photo is expert grade 2, referable, and Roshni gives it an all-clear. We show it on purpose.</p>
+      <ul class="lims">
+        <li>Not yet tested on patients in Pakistan or on low-cost cameras.</li>
+        <li>At new hospitals the cut-off must be re-set on local photos.</li>
+        <li>Does not detect macular oedema. One photo per eye.</li>
+        <li>A research prototype: not a medical device and not a diagnosis.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="end" data-scene="calm" data-zoom="1.3,1.6" data-name="Next">
+    <div class="card">
+      <p class="eyebrow" style="justify-content:center">06 · Next</p>
+      <h2>See it <em>work.</em></h2>
+      <p>The live demo runs the real model in your browser, on example photos or your own.</p>
+      <div class="cta"><a class="btn main" href="../web/">Open the live demo</a><a class="btn" href="https://github.com/MACVXACE/roshni">Code, results and limits</a></div>
+      <p class="disc">Roshni is a research prototype built for the VERITAS AI Hackathon 2026. It is not medical advice, not a diagnosis, and not validated for clinical use.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>Retinal photographs: DeepDRiD (Liu et al., Patterns 2022), CC BY-SA 4.0. Captions give the experts' grade and photo-quality label; Roshni's answers are those of the frozen v1 model.</p>
+  <p>Roshni · VERITAS AI Hackathon 2026 · Open-source code (MIT licence).</p>
+</footer>
+
+<script>
+(() => {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cv = document.getElementById("iris"), ctx = cv.getContext("2d");
+  const ph = document.getElementById("ph"), imgs = [...ph.querySelectorAll("img")];
+  const sections = [...document.querySelectorAll("main section")];
+  const hero = sections[0];
+  let W = 0, H = 0, DPR = 1, vel = 0, lastY = window.scrollY, ticking = false;
+
+  /* An original, procedurally drawn iris: radial fibres, collarette and pupil. Seeded so it is the same every visit. */
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const fibres = Array.from({ length: 760 }, () => {
+    const a = rnd() * Math.PI * 2, warm = rnd();
+    return { a, r0: .36 + rnd() * .1, r1: .78 + rnd() * .2, bend: (rnd() - .5) * .14, w: .5 + rnd() * 1.6,
+      c: warm < .55 ? `hsla(${32 + rnd() * 14},${55 + rnd() * 25}%,${38 + rnd() * 24}%,${.35 + rnd() * .45})`
+                    : `hsla(${170 + rnd() * 16},${28 + rnd() * 22}%,${30 + rnd() * 22}%,${.3 + rnd() * .4})` };
+  });
+  const crypts = Array.from({ length: 34 }, () => ({ a: rnd() * Math.PI * 2, r: .5 + rnd() * .32, s: .015 + rnd() * .03 }));
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * DPR; cv.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    render();
+  }
+
+  function drawIris(z, rot, fade) {
+    ctx.fillStyle = "#06080b"; ctx.fillRect(0, 0, W, H);
+    if (fade <= 0) return;
+    const cx = W * (W > 899 ? .66 : .5), cy = H * (W > 899 ? .46 : .24), R = Math.min(W, H) * (W > 899 ? .3 : .27) * z;
+    ctx.save(); ctx.globalAlpha = fade;
+    const glow = ctx.createRadialGradient(cx, cy, R * .2, cx, cy, R * 1.6);
+    glow.addColorStop(0, "rgba(242,194,122,.10)"); glow.addColorStop(1, "rgba(6,8,11,0)");
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+    const base = ctx.createRadialGradient(cx, cy, R * .3, cx, cy, R);
+    base.addColorStop(0, "#3a2a15"); base.addColorStop(.55, "#1f2b2a"); base.addColorStop(.92, "#121a1c"); base.addColorStop(1, "#06080b");
+    ctx.fillStyle = base; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+    ctx.lineCap = "round";
+    for (const f of fibres) {
+      const a = f.a + rot, a2 = a + f.bend;
+      ctx.strokeStyle = f.c; ctx.lineWidth = f.w * Math.max(1, z * .6);
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a) * f.r0 * R, cy + Math.sin(a) * f.r0 * R);
+      ctx.quadraticCurveTo(cx + Math.cos(a2) * .62 * R, cy + Math.sin(a2) * .62 * R, cx + Math.cos(a) * f.r1 * R, cy + Math.sin(a) * f.r1 * R);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "rgba(6,8,11,.55)";
+    for (const c of crypts) { const a = c.a + rot; ctx.beginPath(); ctx.ellipse(cx + Math.cos(a) * c.r * R, cy + Math.sin(a) * c.r * R, c.s * R * 1.8, c.s * R, a, 0, Math.PI * 2); ctx.fill(); }
+    ctx.strokeStyle = "rgba(242,194,122,.45)"; ctx.lineWidth = 1.2 * Math.max(1, z * .5);
+    ctx.setLineDash([3 * z, 5 * z]); ctx.beginPath(); ctx.arc(cx, cy, R * .52, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    const limb = ctx.createRadialGradient(cx, cy, R * .9, cx, cy, R * 1.04);
+    limb.addColorStop(0, "rgba(6,8,11,0)"); limb.addColorStop(1, "rgba(6,8,11,1)");
+    ctx.fillStyle = limb; ctx.beginPath(); ctx.arc(cx, cy, R * 1.05, 0, Math.PI * 2); ctx.fill();
+    const pr = R * .34;
+    const pup = ctx.createRadialGradient(cx, cy, pr * .7, cx, cy, pr * 1.06);
+    pup.addColorStop(0, "#020304"); pup.addColorStop(1, "rgba(2,3,4,0)");
+    ctx.fillStyle = pup; ctx.beginPath(); ctx.arc(cx, cy, pr * 1.06, 0, Math.PI * 2); ctx.fill();
+    const hl = clamp(1 - (z - 1) / 2.5, 0, 1);
+    if (hl > 0) { ctx.fillStyle = `rgba(255,246,230,${(.85 * hl).toFixed(3)})`; ctx.beginPath(); ctx.ellipse(cx - pr * .38, cy - pr * .42, pr * .16, pr * .1, -.6, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+  }
+
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  let t0 = performance.now();
+
+  function render() {
+    const y = window.scrollY, vh = H;
+    document.getElementById("progress").style.transform = `scaleX(${clamp(y / (document.documentElement.scrollHeight - vh), 0, 1)})`;
+    // hero: fly into the pupil
+    const hp = clamp(y / (hero.offsetHeight - vh), 0, 1);
+    const rot = reduce ? 0 : (performance.now() - t0) * .00002;
+    const z = reduce ? 1 : Math.pow(13, Math.pow(hp, 1.35));
+    drawIris(z, rot, 1 - clamp((hp - .82) / .18, 0, 1));
+    document.querySelector(".hero .sticky").style.opacity = String(1 - clamp(hp / .45, 0, 1));
+    // which section is in the middle of the screen
+    const mid = y + vh * .5;
+    let cur = sections[0], p = 0;
+    for (const s of sections) { if (mid >= s.offsetTop) { cur = s; p = clamp((mid - s.offsetTop) / s.offsetHeight, 0, 1); } }
+    const idx = sections.indexOf(cur);
+    document.getElementById("chapNum").textContent = String(idx + 1).padStart(2, "0");
+    document.getElementById("chapName").textContent = cur.dataset.name || "";
+    document.body.classList.toggle("reading", idx > 0 && idx < sections.length - 1);
+    // the retinal photo emerges from the pupil, then follows the story
+    let op = 1, sc = 1;
+    if (idx === 0) { op = clamp((hp - .72) / .28, 0, 1); sc = lerp(.35, 1, op); }
+    else { const zr = (cur.dataset.zoom || "1,1").split(",").map(Number); sc = reduce ? 1 : lerp(zr[0], zr[1], p); }
+    const scene = idx === 0 ? "calm" : cur.dataset.scene;
+    imgs.forEach(im => im.classList.toggle("on", im.dataset.k === scene));
+    ph.style.setProperty("--ring", cur.dataset.ring || "var(--light)");
+    document.documentElement.style.setProperty("--ring", cur.dataset.ring || "var(--light)");
+    const side = W > 899 && idx > 0 && idx < sections.length - 1 ? 14 : 0;
+    const blur = reduce ? 0 : clamp(Math.abs(vel) * .06, 0, 9);
+    if (idx === sections.length - 1) op = .32;
+    ph.style.opacity = String(op);
+    ph.style.transform = `translate(calc(-50% + ${side}vw), -50%) scale(${sc.toFixed(4)})`;
+    ph.style.filter = blur > .3 ? `blur(${blur.toFixed(1)}px)` : "none";
+  }
+
+  function loop() {
+    const y = window.scrollY;
+    vel = lerp(vel, y - lastY, .35); lastY = y;
+    render();
+    const heroVisible = y < hero.offsetHeight;
+    if (Math.abs(vel) > .2 || (heroVisible && !reduce)) requestAnimationFrame(loop); else ticking = false;
+  }
+  function kick() { if (!ticking) { ticking = true; requestAnimationFrame(loop); } }
+  window.addEventListener("scroll", kick, { passive: true });
+  window.addEventListener("resize", resize);
+
+  // text reveals and number counters
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add("in");
+    e.target.querySelectorAll("[data-count]").forEach(el => {
+      if (el.dataset.done) return; el.dataset.done = "1";
+      const end = parseFloat(el.dataset.count), dec = el.dataset.dec !== undefined ? +el.dataset.dec : 1;
+      if (reduce) { el.textContent = end.toFixed(dec); return; }
+      const t1 = performance.now();
+      const step = now => { const k = clamp((now - t1) / 1400, 0, 1), e2 = 1 - Math.pow(1 - k, 3); el.textContent = (end * e2).toFixed(dec); if (k < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    });
+  }), { threshold: .25 });
+  document.querySelectorAll(".card").forEach(c => io.observe(c));
+
+  resize(); kick();
+})();
+</script>
+</body>
+</html>

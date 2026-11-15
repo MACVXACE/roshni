@@ -239,6 +239,7 @@ Al-Ibrahim Eye Hospital, Karachi, runs a one-window diabetes eye facility that i
 | `local_calibration.py` | Re-setting the cut-off on a small local sample (added after the external result; needs no GPU) |
 | `two_photo.py`, `non_retinal_check.py` | Two photos per eye, and pictures that are not retinal photos (both added after the main results; the second needs the model, no GPU) |
 | `results/` | Outputs of the run: `results.json`, per-photo predictions, the model (`model_best.pt`) and quality check (`quality_gate.pkl`), figures (no APTOS photos) |
+| `story/` | A one-page scroll story of the project that links to the demo (no outside requests; numbers from `results/`) |
 | `web/` | The browser demo (ONNX Runtime Web; works offline after the first visit); `export_web.py` builds it from the run |
 | `app.py` | An optional Gradio version of the demo |
 | `fill_report.py`, `README.template.md` | Writes this README from `results/` so no number is typed by hand; `check_submission.py` checks it against the rules |
