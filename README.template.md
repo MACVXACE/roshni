@@ -73,23 +73,26 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 - Medios AI, offline smartphone screening in India (Natarajan et al., JAMA Ophthalmology 2019): https://pubmed.ncbi.nlm.nih.gov/31393538/ and in Dominica (Kemp et al., BMJ Open Ophthalmology 2023): https://bmjophth.bmj.com/content/8/1/e001491
 - APTOS 2019 Blindness Detection: https://www.kaggle.com/c/aptos2019-blindness-detection
 - DeepDRiD (Liu et al., Patterns 2022): https://github.com/deepdrdoc/DeepDRiD
+- OIA-DDR (Li et al., Information Sciences 2019; used only in the v2 experiment): https://github.com/nkicsl/DDR-dataset and https://doi.org/10.1016/j.ins.2019.06.011
 - Pretrained model: EfficientNet-B0 with ImageNet weights (torchvision `IMAGENET1K_V1`): https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.efficientnet_b0.html; EfficientNet paper (Tan and Le 2019): https://arxiv.org/abs/1905.11946
 - Grad-CAM (Selvaraju et al. 2017): https://arxiv.org/abs/1610.02391
-- Libraries: PyTorch https://pytorch.org, scikit-learn https://scikit-learn.org, pandas https://pandas.pydata.org, Pillow https://python-pillow.org, matplotlib https://matplotlib.org, Gradio https://www.gradio.app, ONNX Runtime and ONNX Runtime Web https://onnxruntime.ai
+- Libraries: PyTorch https://pytorch.org, scikit-learn https://scikit-learn.org, pandas https://pandas.pydata.org, Pillow https://python-pillow.org, matplotlib https://matplotlib.org, Gradio https://www.gradio.app, ONNX Runtime and ONNX Runtime Web https://onnxruntime.ai, NumPy https://numpy.org, scikit-image (sample photos in `non_retinal_check.py`) https://scikit-image.org
+- Tools for tests and the video only: Playwright https://playwright.dev, FFmpeg https://ffmpeg.org, Node.js https://nodejs.org
 - AI tools: [TEAM_TO_WRITE(ai_tools): every assistant used, e.g. Claude (Anthropic) for code and research support]
 
 ---
 
 ## Appendix: technical details
 
-**How this maps to the judging criteria**
+**How this maps to the Round 1 rubric** (highschoolhackathon.org/judges)
 
-| Criterion | Evidence in this project |
+| Criterion (points) | Evidence in this project |
 |---|---|
-| Technical quality | Two baselines; threshold frozen on validation; held-out test; untouched external set from another country with patient-level confidence intervals; a stress test planned before results; missed cases and false alarms reported separately |
-| Impact | A named user and moment in Pakistani primary care; three actions a clinic can act on; verified diabetes and eye-workforce figures for Pakistan; a demo that runs on the devices a clinic already has |
-| Creativity | A proven screening workflow rebuilt in the open, with a retake rule that cuts false all-clears but never blocks a referral, tested on deliberately worse photos; a note in Urdu as well as English |
-| Clarity | A screenshot and one main takeaway at the top; three actions (refer, retake, rescreen); a two-minute video of the real demo; every number generated from `results/` |
+| Technical execution (30) | A demo that runs end to end in the browser and offline, with the browser model checked against PyTorch; EfficientNet-B0 fine-tuned with a near-duplicate-safe split; two baselines; threshold frozen on validation; held-out test; untouched external set from another country with patient-level confidence intervals |
+| Originality (20) | Our own question (does a quality check stop false all-clears?); a retake rule that never blocks a referral; a proven screening workflow rebuilt in the open and re-settable by each clinic; tested on deliberately worse photos and on pictures that are not retinal photos |
+| Impact and track fit (20) | A named user and moment in Pakistani primary care; three actions a clinic can act on; sourced diabetes and eye-workforce figures for Pakistan; no server, account or licence; a note in Urdu checked by a native speaker |
+| Testing and honesty (15) | Missed cases and false alarms reported separately; named missed photos; a stress test planned before results; the drop at new hospitals reported ([FROM_RESULTS_JSON: results.external_all.sensitivity | pct]); a pre-registered experiment (v2) reported although it failed; post-hoc analyses labelled as post-hoc; a real-world yardstick that none of our settings meets yet |
+| Communication (15) | A screenshot and one main takeaway at the top; three actions (refer, retake, rescreen); a two-minute video of the real demo; every number generated from `results/` |
 
 **What already exists, and where Roshni differs** (from FDA summaries and published studies; their accuracy comes from prospective studies, ours from public photos)
 

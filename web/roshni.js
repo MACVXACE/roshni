@@ -331,7 +331,12 @@ if (typeof window !== "undefined") {
     UI.en.h3t = "English and Urdu"; UI.en.h3d = "Interface and patient note in English and Urdu; the Urdu was checked by a native speaker.";
     UI.ur.h3t = "انگریزی اور اردو"; UI.ur.h3d = "انٹرفیس اور مریض کا نوٹ انگریزی اور اردو میں؛ اردو کی جانچ اہلِ زبان نے کی ہے۔";
   }
-  /* Uzbek patient note (draft; not in roshni_web.json yet). */
+  if (SHOW_UZBEK) {   // once Laziza has approved: say so, in every interface language (UR line: Zainab to check; UZ line: Laziza)
+    UI.en.h3d = "Interface and patient note in English, Urdu and Uzbek, each checked by a native speaker on our team.";
+    UI.ur.h3d = "انٹرفیس اور مریض کا نوٹ انگریزی، اردو اور ازبک میں؛ ہر زبان کی جانچ ہماری ٹیم کے اہلِ زبان رکن نے کی ہے۔";
+    UI.uz.h3d = "Interfeys va bemor eslatmasi ingliz, urdu va oʻzbek tillarida; har bir tilni jamoamizdagi ona tili egasi tekshirgan.";
+  }
+  /* Uzbek patient note (draft; used only if roshni_web.json has no Uzbek note yet). */
   const NOTE_UZ = {
     REFER: "Yuborishni talab qiluvchi diabetik retinopatiya gumon qilinmoqda (oʻrtacha yoki ogʻirroq). Shifokor tasdiqlashi uchun tavsiya etilgan keyingi qadam: koʻz mutaxassisiga yuborish.",
     RETAKE: "Rasm kasallikni istisno qilish uchun yetarlicha aniq emas. Tavsiya etilgan keyingi qadam: rasmni qayta oling; hali ham noaniq boʻlsa, koʻz mutaxassisiga yuboring.",
