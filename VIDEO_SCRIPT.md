@@ -5,19 +5,19 @@
 ## 0:00 to 0:15 · Zainab · The problem
 *(On screen: title card, then the three Pakistan numbers.)*
 
-In Pakistan, about one adult in three has diabetes, and there are only about fifteen eye specialists per million people. Diabetic eye disease is treatable when it is caught early, but most diabetes clinics cannot check for it.
+In Pakistan, about one adult in three has diabetes. Diabetic eye disease is treatable when caught early, but screening sits mostly in eye hospitals, and there are only about fifteen eye specialists per million people.
 
 ## 0:15 to 1:15 · Varun · The demo
 *(On screen: the browser demo.)*
 
-This is Roshni, running entirely inside a web browser. At a routine diabetes visit, the nurse photographs the back of the eye. Roshni gives the doctor one of three next steps to confirm, and the photo never leaves the device. This photo shows referable disease, so it says refer; the heat map shows where it looked. This next photo is too poor to read. Roshni asks for a retake: a bad photo never gets an all-clear. But if a poor photo already shows serious disease, it still says refer: a bad photo never blocks a referral. The note prints in Urdu, so the patient knows what happens next. Underneath: an open EfficientNet model trained on photos from rural India, plus a photo-quality check.
+This is Roshni, running entirely inside a web browser. At a routine diabetes visit, the nurse photographs the back of the eye. Roshni gives the doctor one of three next steps to confirm, and the photo never leaves the device. This photo shows referable disease, so it says refer; the heat map shows where it looked. This next photo is too poor to read. Roshni asks for a retake instead of an all-clear. But if a poor photo already shows serious disease, it still says refer: a bad photo never blocks a referral. The note prints in Urdu, so the patient knows what happens next. Underneath: an open EfficientNet model trained on photos from rural India, plus a photo-quality check.
 
 ## 1:15 to 1:45 · Laziza · How we know it works
 *(On screen: the results table, then the stress-test chart.)*
 
-We froze every threshold before testing. On 352 unseen Indian photos, Roshni caught 84.2% of referable eyes at 94.0% specificity: AUC 0.98, against 0.85 for a colour baseline. On 1,600 Chinese hospital photos it had never seen, the AUC was 0.91, but it caught only 56.1%, so a clinic must re-check the threshold on its own photos. The quality check cut false all-clears from 81 to 46, for 154 retakes. On deliberately worse photos: at most 51 false all-clears with the check, up to 161 without it.
+We froze every threshold before testing. On 352 unseen Indian photos, Roshni caught 84.2% of referable photos at 94.0% specificity: AUC 0.98, against 0.85 for a colour baseline. On 1,600 Chinese hospital photos it had never seen, the AUC was 0.91, but it caught only 56.1%, so a clinic must re-check the threshold on its own photos. The quality check cut false all-clears from 81 to 46, for 154 retakes. On deliberately worse photos: at most 51 false all-clears with the check, up to 161 without it.
 
 ## 1:45 to 2:00 · Zainab · Limits and next step
 *(On screen: results/missed_external.png, then the limits slide. Both show only DeepDRiD photos, which may be shared with credit; keep APTOS photos off the public video.)*
 
-It still misses disease, mostly tiny lesions hidden by shadows, glare, and camera shifts, and we had no Pakistani photos to test on. Next, we would test it in a Pakistani clinic, with low-cost cameras. Roshni is a prototype, not medical advice.
+Roshni still misses disease, including tiny lesions hidden by shadows, glare, and camera shifts, and we had no Pakistani photos to test on. Next: graded Pakistani photos and low-cost cameras. Roshni is a prototype, not medical advice.

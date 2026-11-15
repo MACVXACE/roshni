@@ -71,7 +71,7 @@ def stress_chart(rows, path):
         ax.text(vb + top * 0.01, yy - h / 2, str(int(vb)), va="center", fontsize=11, color="#1f2328", fontweight="bold")
     ax.set_yticks(y, labels)
     ax.set_xlim(0, top * 1.1)
-    ax.set_xlabel(f"Referable eyes given an all-clear (of {int(d.referable.iloc[0])})", fontsize=12, color="#4b5563")
+    ax.set_xlabel(f"Referable photos given an all-clear (of {int(d.referable.iloc[0])})", fontsize=12, color="#4b5563")
     ax.legend(frameon=False, fontsize=12, loc="lower right")
     fig.suptitle(f"{name} photos ({int(d.n.iloc[0])}), each made worse in a fixed way", fontsize=12, x=0.01, ha="left", color="#4b5563")
     fig.tight_layout()
@@ -82,7 +82,7 @@ def stress_chart(rows, path):
 def build_slides(pub, R, tmp):
     r = R["results"]
     slides = {}
-    slides["title"] = slide("<h1>Roshni</h1><div class='sub'>Open, fail-safe diabetic eye triage for primary-care clinics in Pakistan"
+    slides["title"] = slide("<h1>Roshni</h1><div class='sub'>Open, offline diabetic eye triage for primary-care clinics in Pakistan"
                             "</div><span class='tag'>Prototype for a student hackathon · not medical advice</span>")
     slides["problem"] = slide(
         "<h2>Pakistan: diabetes is common, eye specialists are not</h2><div class='row'>"
@@ -112,11 +112,11 @@ def build_slides(pub, R, tmp):
     if os.path.exists(miss):
         shutil.copy(miss, os.path.join(tmp, "missed_external.png"))
         slides["misses"] = slide("<h2>Where it fails</h2><img class='fig' src='missed_external.png' style='width:100%'>"
-                                 "<div class='note'>Referable eyes given an all-clear on the external photos. Labels show the "
+                                 "<div class='note'>Referable photos given an all-clear on the external photos. Labels show the "
                                  "experts' grade and the model's score. Photos: DeepDRiD (Liu et al., Patterns 2022), CC BY-SA 4.0.</div>")
     slides["limits"] = slide(
         "<h2>Limits and next step</h2><ul>"
-        f"<li>Missed {ft['missed_FN']} of {ft['referable']} referable eyes in the unseen test photos from India.</li>"
+        f"<li>Missed {ft['missed_FN']} of {ft['referable']} referable photos in the unseen test set from India.</li>"
         f"<li>On new hospitals' photos it caught only {pct(r['external_all']['sensitivity'])}: each clinic must re-set the cut-off on its own photos.</li>"
         "<li>Not yet tested on Pakistani patients or on low-cost cameras.</li>"
         "<li><b>Next:</b> test the frozen tool with a Pakistani clinic that already screens.</li></ul>"

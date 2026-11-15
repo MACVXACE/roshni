@@ -1,4 +1,4 @@
-# Roshni: open, fail-safe diabetic eye triage for primary-care clinics in Pakistan
+# Roshni: open, offline diabetic eye triage for primary-care clinics in Pakistan
 
 **Track:** Health
 **Team:** Varun Bajpai (India), Laziza Farrukhovna (Uzbekistan), Zainab Jamshed (Pakistan)
@@ -6,27 +6,31 @@
 
 > This project is a prototype and is not medical advice.
 
+![](docs/roshni_demo.png)
+
+**Main takeaway:** Roshni ranks disease well at unseen hospitals (AUC [FROM_RESULTS_JSON: results.external_all.AUC | .3f]), but each clinic must re-set its cut-off locally, which an open tool allows.
+
 <!-- Generated from README.template.md by fill_report.py. Edit the template, not this file. Numbers come only from results/. -->
 
 ## The problem
 <!-- team:problem -->Pakistan has the world's highest diabetes prevalence: 31.4% of adults, about 34.5 million people, and in Pakistani studies about 29% of people with diabetes had diabetic retinopathy (9% sight-threatening). It is treatable if caught early, but Pakistan has about 15 ophthalmologists per million people, mostly in cities (high-income countries: 76). Screening is not available at primary level, travel to city hospitals is costly and harder for women, and surveyed eye hospitals had no screening policy.<!-- /team:problem -->
 
 ## What we built
-**User:** a doctor or nurse in a Pakistani primary-care diabetes clinic with a retinal camera but no eye specialist. **In:** one retinal photo. **Out:** one next step for the doctor to confirm: **REFER** (moderate or worse retinopathy suspected, grade 2 to 4), **RETAKE** (too unclear to rule disease out) or **RESCREEN** in 12 months.
-**Safety rule:** a poor photo never gets an all-clear and never blocks a referral. It also shows the estimated grade, a heat map and a note in English and Urdu.
+**User:** a doctor or nurse in a Pakistani primary-care diabetes clinic with a retinal camera but no eye specialist. **In:** one retinal photo. **Out:** one next step for the doctor to confirm: **REFER** (moderate or worse, grade 2 to 4), **RETAKE** (too unclear to rule disease out) or **RESCREEN** in 12 months.
+**Safety rule:** a photo judged too poor to read gets a retake instead of an all-clear, and never blocks a referral. It also shows the estimated grade, a heat map and a note in English and Urdu.
 
 ## What we added
-Our own idea (track 4.1.4), not one of the suggested projects.
+Our own idea (track 4.1.4).
 
-- **What already exists:** FDA-cleared LumineticsCore and EyeArt, and Medios AI (offline, on a smartphone camera, in India): all commercial and closed (appendix). Medicare pays US$46.76 for one AI eye exam, more than Pakistan's total health spending per person per year (US$30.49 in 2023).
-- **What we add:** an open, safety-first version anyone can re-test: thresholds frozen before testing, failures published, a retake rule that never blocks a referral, a stress test planned before any result, and a browser demo that keeps the photo on the device and works offline ([FROM_RESULTS_JSON: derived.cpu_short]).
-- **Own question:** does the photo-quality check stop false all-clears? On [FROM_RESULTS_JSON: derived.val_photos | int] external photos, referable eyes given an all-clear fell from [FROM_RESULTS_JSON: workflow.without_quality_gate.referable_given_all_clear | int] to [FROM_RESULTS_JSON: workflow.with_quality_gate.referable_given_all_clear | int] (severe or proliferative: [FROM_RESULTS_JSON: workflow.without_quality_gate.sight_threatening_given_all_clear | int] to [FROM_RESULTS_JSON: workflow.with_quality_gate.sight_threatening_given_all_clear | int]), at the cost of [FROM_RESULTS_JSON: workflow.with_quality_gate.RETAKE | int] retakes.
-- **New source:** trained on rural India (APTOS 2019), tested once on Chinese hospital photos (DeepDRiD) the grading model never saw.
+- **What already exists:** FDA-cleared LumineticsCore and EyeArt, and Medios AI (offline, smartphone camera, India): all commercial and closed (appendix); UK estimates for AI graders were GBP 0.35 to 3.02 per patient (NICE 2021).
+- **What we add:** an open, safety-first version anyone can re-test: thresholds frozen before testing, failures published, a retake rule that never blocks a referral, a pre-planned stress test, and a browser demo that keeps the photo on the device and works offline ([FROM_RESULTS_JSON: derived.cpu_short]).
+- **Own question:** does the photo-quality check stop false all-clears? On [FROM_RESULTS_JSON: derived.val_photos | int] external photos, referable photos given an all-clear fell from [FROM_RESULTS_JSON: workflow.without_quality_gate.referable_given_all_clear | int] to [FROM_RESULTS_JSON: workflow.with_quality_gate.referable_given_all_clear | int] (severe or proliferative: [FROM_RESULTS_JSON: workflow.without_quality_gate.sight_threatening_given_all_clear | int] to [FROM_RESULTS_JSON: workflow.with_quality_gate.sight_threatening_given_all_clear | int]), costing [FROM_RESULTS_JSON: workflow.with_quality_gate.RETAKE | int] retakes.
+- **New source:** trained on rural India (APTOS 2019), tested once on unseen Chinese hospital photos (DeepDRiD).
 
 ## How it works
-- **Data:** APTOS 2019, 3,662 photos graded 0 to 4 (Aravind Eye Hospital, India), split by grade into [FROM_RESULTS_JSON: derived.split_counts], with [FROM_RESULTS_JSON: duplicates.pairs | int] near-duplicate pairs (found by image hashing) kept on one side of the split. External: [FROM_RESULTS_JSON: derived.ext_photos | int] DeepDRiD photos from [FROM_RESULTS_JSON: derived.ext_patients | int] patients with expert quality labels.
+- **Data:** APTOS 2019, 3,662 photos graded 0 to 4 (Aravind Eye Hospital, India), split by grade into [FROM_RESULTS_JSON: derived.split_counts], with [FROM_RESULTS_JSON: duplicates.pairs | int] near-duplicate pairs kept on one side of the split. External: [FROM_RESULTS_JSON: derived.ext_photos | int] DeepDRiD photos from [FROM_RESULTS_JSON: derived.ext_patients | int] patients with expert quality labels.
 - **Model:** EfficientNet-B0 (ImageNet weights), fine-tuned for [FROM_RESULTS_JSON: derived.epochs_run | int] epochs at [FROM_RESULTS_JSON: frozen.size | int] px; referable score = probability of grade 2 or worse.
-- **Frozen before testing:** the referral threshold ([FROM_RESULTS_JSON: frozen.ref_threshold | .3f]) was set for [FROM_RESULTS_JSON: frozen.target_sensitivity | pct0] sensitivity on validation; the quality check (logistic regression on the model's image features, cut-off [FROM_RESULTS_JSON: frozen.poor_threshold | .2f]) was trained only on DeepDRiD's 1,200 training photos.
+- **Frozen before testing:** the referral threshold ([FROM_RESULTS_JSON: frozen.ref_threshold | .3f]) was set for [FROM_RESULTS_JSON: frozen.target_sensitivity | pct0] sensitivity on validation; the quality check (logistic regression on image features, cut-off [FROM_RESULTS_JSON: frozen.poor_threshold | .2f]) was trained only on DeepDRiD's 1,200 training photos.
 - **Baselines:** colour histogram, and untuned pretrained features, each + logistic regression, thresholded the same way.
 
 ## Results
@@ -41,7 +45,7 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 - **Where it fails:** [TEAM_TO_WRITE(where_it_fails): two missed eyes from results/missed_external.png (or the team-only APTOS gallery) and the reason you see in each, e.g. blur, small lesions near the edge, or a grade you would dispute]
 - **What we learned:** [TEAM_TO_WRITE(what_we_learned): two or three sentences on what surprised you, e.g. how the external photos, the poor-quality photos or the stress test changed what you believed, and what you would do differently]
 
-**Limitations.** Not tested on Pakistani patients or low-cost cameras; the stress test only imitates worse photos. APTOS grades come from single graders. Unlike the commercial tools, we do not detect macular oedema, use one photo per eye and have no prospective trial. No age or sex is recorded; we compared hospital sources and photo quality (appendix).
+**Limitations.** Not tested on Pakistani patients or low-cost cameras; the stress test only imitates worse photos. APTOS grades come from single graders. Unlike commercial tools, we do not detect macular oedema, use one photo per eye and have no prospective trial. No age or sex is recorded; we compared hospital sources and photo quality (appendix).
 
 ## What we'd do next
 <!-- team:next_steps -->1. Test the frozen tool on the expert-graded Pakistani dataset registered at Al-Ibrahim Eye Hospital, Karachi (50,000 patients planned, NCT06287645), then in a primary-care clinic that already screens.
@@ -55,11 +59,12 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 - Sightsavers 2021, diabetic retinopathy services in Pakistan (primary level, cities, barriers for women): https://www.sightsavers.org/blogs/2021/06/diabetic-retinopathy-in-pakistan
 - Shah et al. 2019, screening policy in Pakistani eye hospitals: https://www.ijo.cn/gjyken/article/pdf/20190517
 - Siddiqui, Zafar and Qazi 2023, AI and the future of healthcare in Pakistan (J Pak Med Assoc): https://jpma.org.pk/index.php/public_html/article/view/10917/2701
-- Pakistan health spending per person, 2023 (World Bank, via TheGlobalEconomy): https://www.theglobaleconomy.com/Pakistan/Health_spending_per_capita/
 - Pakistan public primary-care spending (World Bank, Health Financing System Assessment): https://openknowledge.worldbank.org/bitstreams/716ee589-8e2b-4c9c-9759-b2d45c68ee01/download
 - Barriers to eye care in Pakistan (Malik et al. 2025): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12260732/
 - Pakistani expert-graded retinal dataset registered on ClinicalTrials.gov (NCT06287645; site: Al-Ibrahim Eye Hospital, Karachi): https://clinicaltrials.gov/study/NCT06287645
-- Medicare payment for CPT 92229 (2026): https://payerprice.com/rates/92229-CPT-fee-schedule
+- NICE MIB265 (2021), AI technologies for detecting diabetic retinopathy (cost per patient): https://www.nice.org.uk/advice/mib265/chapter/summary
+- Jawa et al. 2016, integrated primary-care model for DR detection in Pakistan (Pak J Med Sci; cites the 223-patient clinic study): https://pjms.com.pk/index.php/pjms/article/view/10955
+- Ahsan et al. 2021, one-window diabetes eye care facility at Al-Ibrahim Eye Hospital (Pak J Med Sci): https://pjms.org.pk/index.php/pjms/article/download/3946/1100
 - Topcon NW400 cost and IDx-DR fee not public (AAFP 2020): https://www.aafp.org/pubs/afp/issues/2020/0301/p307.html
 - Google's Thailand deployment (MIT Technology Review 2020): https://www.technologyreview.com/2020/04/27/1000658/google-medical-ai-accurate-lab-real-life-clinic-covid-diabetes-retina-disease/amp/ and (TechCrunch 2020): https://techcrunch.com/2020/04/27/google-medical-researchers-humbled-when-ai-screening-tool-falls-short-in-real-life-testing/
 - LumineticsCore (IDx-DR) FDA 510(k) summary K203629: https://www.accessdata.fda.gov/cdrh_docs/pdf20/K203629.pdf
@@ -84,8 +89,8 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 |---|---|
 | Technical quality | Two baselines; threshold frozen on validation; held-out test; untouched external set from another country with patient-level confidence intervals; a stress test planned before results; missed cases and false alarms reported separately |
 | Impact | A named user and moment in Pakistani primary care; three actions a clinic can act on; verified diabetes and eye-workforce figures for Pakistan; a demo that runs on the devices a clinic already has |
-| Creativity | A proven screening workflow rebuilt in the open, with a rule that blocks false all-clears but never blocks a referral, tested on deliberately worse photos; an Urdu note |
-| Clarity | One sentence: refer, retake or rescreen, and a bad photo never gets an all-clear |
+| Creativity | A proven screening workflow rebuilt in the open, with a retake rule that cuts false all-clears but never blocks a referral, tested on deliberately worse photos; a note in Urdu as well as English |
+| Clarity | One sentence: refer, retake or rescreen; a photo too poor to read is retaken, not cleared |
 
 **What already exists, and where Roshni differs** (from FDA summaries and published studies; their accuracy comes from prospective studies, ours from public photos)
 
@@ -118,7 +123,7 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 | Choice | Evidence |
 |---|---|
 | Refer, retake, or rescreen in 12 months | LumineticsCore's outputs and 12-month advice |
-| A poor photo never gets an all-clear, never blocks a referral | Google's Thailand deployment rejected more than a fifth of photos and left patients waiting; EyeArt could not grade 12.6% of undilated eyes |
+| A photo too poor to read is retaken, not cleared, and never blocks a referral | Google's Thailand deployment rejected more than a fifth of photos and left patients waiting; EyeArt could not grade 12.6% of undilated eyes |
 | Runs in a browser or on a CPU, offline | Internet outages halved screening at one Thai clinic; Pakistan's public primary-care spending is about US$16 per person |
 | One photo, any camera, no licence fee | LumineticsCore needs a US$15,000 to 22,000 Topcon camera and two photos per eye, with a per-image fee that is not public; Medios is tied to Remidio's camera |
 | Open, frozen thresholds | No public expert-graded Pakistani dataset yet, so a local clinic must be able to re-test the tool itself |
@@ -146,7 +151,7 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 
 [FROM_RESULTS_JSON: table.v2_tests]<!-- /if:v2 -->
 
-**Re-setting the cut-off locally (added after seeing the external result; the frozen results above stay the main ones).** We drew a "clinic sample" of DeepDRiD training patients (whole patients, all their photos), set the referral cut-off for [FROM_RESULTS_JSON: frozen.target_sensitivity | pct0] sensitivity on it with the same function used to freeze the original, and scored the full workflow on the 400 validation photos from [FROM_RESULTS_JSON: derived.lc_eval_patients | int] other patients; the grading model never saw any DeepDRiD photo. Over [FROM_RESULTS_JSON: derived.lc_draws | int] random samples of [FROM_RESULTS_JSON: derived.lc_patients | int] patients: sensitivity [FROM_RESULTS_JSON: derived.lc_sens | .1f]% (10th to 90th percentile [FROM_RESULTS_JSON: derived.lc_sens_range]) instead of [FROM_RESULTS_JSON: derived.lc_frozen_sens | .1f]%, specificity [FROM_RESULTS_JSON: derived.lc_spec | .1f]% ([FROM_RESULTS_JSON: derived.lc_spec_range]) instead of [FROM_RESULTS_JSON: derived.lc_frozen_spec | .1f]%; referable eyes given an all-clear [FROM_RESULTS_JSON: derived.lc_allclear | int] instead of [FROM_RESULTS_JSON: derived.lc_frozen_allclear | int] (severe or proliferative: [FROM_RESULTS_JSON: derived.lc_sev_allclear | int]), at the cost of [FROM_RESULTS_JSON: derived.lc_refer | int] referrals instead of [FROM_RESULTS_JSON: derived.lc_frozen_refer | int]. The same hospitals supply both sets, so this shows the procedure works, not that one cut-off fits every clinic. See `results/local_calibration.png` and `local_calibration.py`.
+**Re-setting the cut-off locally (added after seeing the external result; the frozen results above stay the main ones).** We drew a "clinic sample" of DeepDRiD training patients (whole patients, all their photos), set the referral cut-off for [FROM_RESULTS_JSON: frozen.target_sensitivity | pct0] sensitivity on it with the same function used to freeze the original, and scored the full workflow on the 400 validation photos from [FROM_RESULTS_JSON: derived.lc_eval_patients | int] other patients; the grading model never saw any DeepDRiD photo. Over [FROM_RESULTS_JSON: derived.lc_draws | int] random samples of [FROM_RESULTS_JSON: derived.lc_patients | int] patients: sensitivity [FROM_RESULTS_JSON: derived.lc_sens | .1f]% (10th to 90th percentile [FROM_RESULTS_JSON: derived.lc_sens_range]) instead of [FROM_RESULTS_JSON: derived.lc_frozen_sens | .1f]%, specificity [FROM_RESULTS_JSON: derived.lc_spec | .1f]% ([FROM_RESULTS_JSON: derived.lc_spec_range]) instead of [FROM_RESULTS_JSON: derived.lc_frozen_spec | .1f]%; referable photos given an all-clear [FROM_RESULTS_JSON: derived.lc_allclear | int] instead of [FROM_RESULTS_JSON: derived.lc_frozen_allclear | int] (severe or proliferative: [FROM_RESULTS_JSON: derived.lc_sev_allclear | int]), at the cost of [FROM_RESULTS_JSON: derived.lc_refer | int] referrals instead of [FROM_RESULTS_JSON: derived.lc_frozen_refer | int]. The same hospitals supply both sets, so this shows the procedure works, not that one cut-off fits every clinic. See `results/local_calibration.png` and `local_calibration.py`.
 
 **Photo-quality check:** found poor photos with AUC [FROM_RESULTS_JSON: quality_gate.AUC_detecting_poor_photos | .3f]; flags [FROM_RESULTS_JSON: quality_gate.poor_photos_flagged | pct] of poor photos and [FROM_RESULTS_JSON: quality_gate.good_photos_flagged | pct] of good ones ([FROM_RESULTS_JSON: quality_gate.flagged_share | pct] of all photos sent to retake or refer on quality).
 
@@ -170,4 +175,4 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 
 **Reproduce:** open `Roshni_DR_Screening.ipynb` on Kaggle (APTOS 2019 attached, GPU and Internet on) and run all; then `python fill_report.py`. To check the results without a GPU: `pip install -r requirements.txt`, then run `Roshni_Results.ipynb`.
 
-**Licences:** our code is MIT (`LICENSE`). The demo photos in `web/examples` are from DeepDRiD (CC BY-SA 4.0, Liu et al. 2022). ONNX Runtime Web is MIT (`web/ort/NOTICE.md`). No APTOS image is included, following the competition's rules; the trained weights were fit on APTOS 2019 data, so check those rules before using them beyond research.
+**Licences:** our code is MIT (`LICENSE`). The demo photos in `web/examples` and the screenshot in `docs/` are from DeepDRiD (CC BY-SA 4.0, Liu et al. 2022). ONNX Runtime Web is MIT (`web/ort/NOTICE.md`). No APTOS image is included, following the competition's rules; the trained weights were fit on APTOS 2019 data, so check those rules before using them beyond research. v2's added training data (OIA-DDR) is CC BY-NC-SA 4.0, non-commercial. Roshni is a research prototype: not a medical device, not registered with Pakistan's drug regulator (DRAP), and not for decisions about real patients.

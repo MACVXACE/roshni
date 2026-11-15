@@ -284,6 +284,9 @@ if (typeof window !== "undefined") {
       renderNote(d);
       lastDecision = d;
       setStatus("Done. Nothing was uploaded.");
+      // On a phone the result sits below the photo list: bring it into view so the answer is not missed.
+      const card = $("card");
+      if (card && card.getBoundingClientRect().top > window.innerHeight * 0.6) card.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (e) {
       setStatus("Something went wrong: " + e.message);
       console.error(e);

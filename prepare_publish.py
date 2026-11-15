@@ -39,6 +39,8 @@ def main():
             shutil.copy(os.path.join(here, f), x.out)
     shutil.copytree(os.path.join(here, "tests"), os.path.join(x.out, "tests"),
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    if os.path.isdir(os.path.join(here, "docs")):            # README screenshot of the browser demo (DeepDRiD photo only)
+        shutil.copytree(os.path.join(here, "docs"), os.path.join(x.out, "docs"))
     for f in os.listdir(os.path.join(src, "results")):
         if f not in SKIP_RESULTS:
             shutil.copy(os.path.join(src, "results", f), os.path.join(x.out, "results", f))

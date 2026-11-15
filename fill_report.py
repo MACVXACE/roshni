@@ -149,9 +149,9 @@ def build(res_dir):
         a, b = wo["referable_given_all_clear"], w["referable_given_all_clear"]
         if b > a:
             raise RuntimeError("Quality check increased all-clears for referable eyes; that should be impossible. Check the run.")
-        d["gate_sentence"] = (f"cut referable eyes given an all-clear from {a} to {b}, at the cost of {w['RETAKE']} retakes"
+        d["gate_sentence"] = (f"cut referable photos given an all-clear from {a} to {b}, at the cost of {w['RETAKE']} retakes"
                               if b < a else
-                              f"did not change the number of referable eyes given an all-clear ({b}), and asked for {w['RETAKE']} retakes")
+                              f"did not change the number of referable photos given an all-clear ({b}), and asked for {w['RETAKE']} retakes")
         d["gate_short"] = (f"cut false all-clears from {a} to {b}, for {w['RETAKE']} retakes" if b < a else
                            f"did not reduce false all-clears ({b}), and asked for {w['RETAKE']} retakes")
     cs = R.get("cpu_speed") or {}
@@ -177,7 +177,7 @@ def build(res_dir):
         wo_hi = int(changed.referable_all_clear_without_check.max())
         d["stress_sentence"] = (
             f"on the {int(clean.n)} {name} photos, sensitivity was {100 * clean.sensitivity:.1f}% on the originals and "
-            f"{100 * worst.sensitivity:.1f}% at worst ({lab(worst)}). With the quality check, referable eyes given an all-clear "
+            f"{100 * worst.sensitivity:.1f}% at worst ({lab(worst)}). With the quality check, referable photos given an all-clear "
             f"were {int(clean.referable_all_clear_with_check)} on the originals and between {w_lo} and {w_hi} across the "
             f"{len(changed)} changes, against up to {wo_hi} without it; the check sent up to "
             f"{100 * changed.retake_share.max():.0f}% of photos to a retake. Strong compression failed the other way: "
@@ -257,7 +257,7 @@ def build(res_dir):
                  ("400-photo workflow: refer / retake / rescreen",
                   f"{R['workflow']['with_quality_gate']['REFER']} / {R['workflow']['with_quality_gate']['RETAKE']} / {R['workflow']['with_quality_gate']['RESCREEN']}",
                   f"{vw['REFER']} / {vw['RETAKE']} / {vw['RESCREEN']}"),
-                 ("400-photo workflow: referable eyes given an all-clear (severe or proliferative)",
+                 ("400-photo workflow: referable photos given an all-clear (severe or proliferative)",
                   f"{R['workflow']['with_quality_gate']['referable_given_all_clear']} ({R['workflow']['with_quality_gate']['sight_threatening_given_all_clear']})",
                   f"{vw['referable_given_all_clear']} ({vw['sight_threatening_given_all_clear']})")]
         if "oiaddr_test" in V["results"]:

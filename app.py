@@ -69,7 +69,7 @@ def build_app(results_dir: str, examples_dir: str | None = None) -> gr.Blocks:
         ex = sorted(glob.glob(os.path.join(examples_dir, "*.jpg")) + glob.glob(os.path.join(examples_dir, "*.png")))[:8]
 
     with gr.Blocks(title="Roshni: diabetic eye screening") as demo:
-        gr.Markdown("# Roshni: fail-safe diabetic eye triage for primary-care diabetes clinics in Pakistan\n"
+        gr.Markdown("# Roshni: offline diabetic eye triage for primary-care diabetes clinics in Pakistan\n"
                     "For a clinic that can take retinal photos but has no eye specialist on site. Upload one photo taken at a "
                     "diabetes check-up; the tool suggests one next step for the doctor to confirm: **refer**, **retake the photo**, "
                     "or **rescreen in 12 months**. A poor photo never gets an all-clear, and never blocks a referral.  \n"

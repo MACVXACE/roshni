@@ -7,7 +7,7 @@ src = {f: open(f, encoding="utf-8").read() for f in ["drscreen.py", "run_dr.py",
                                                        "web/index.html", "web/roshni.js"]}
 
 cells = [
-    md("# Roshni: fail-safe diabetic eye triage for primary-care diabetes clinics in Pakistan\n\n"
+    md("# Roshni: offline diabetic eye triage for primary-care diabetes clinics in Pakistan\n\n"
        "**Track:** AI + Health. **Team:** Varun Bajpai (India), Laziza Farrukhovna (Uzbekistan), Zainab Jamshed (Pakistan).  \n"
        "**User:** a doctor or nurse at a primary-care diabetes clinic in Pakistan that can take retinal photos but has no eye specialist on site. "
        "**Moment:** right after the photo is taken at a routine diabetes visit.  \n"
