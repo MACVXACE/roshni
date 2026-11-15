@@ -30,7 +30,7 @@ Our own idea (track 4.1.4), not one of the suggested projects.
 - **Baselines:** colour histogram, and untuned pretrained features, each + logistic regression, thresholded the same way.
 
 ## Results
-Held-out APTOS test (352 photos, 152 referable) and the external DeepDRiD set:
+Held-out APTOS test (352 photos, 152 referable) and external DeepDRiD:
 
 | Model | AUC (95% CI) | Sensitivity | Specificity | Missed (FN) | False alarms (FP) |
 |---|---|---|---|---|---|
@@ -43,10 +43,10 @@ Held-out APTOS test (352 photos, 152 referable) and the external DeepDRiD set:
 - **External photos:** at the frozen cut-off sensitivity fell to 56.1% though AUC stayed 0.911: the ranking carried over, the cut-off did not. Re-set on about 200 local labelled photos, it gave 92.8% sensitivity and 74.1% specificity (post-hoc; appendix).
 - **v2, more cameras (pre-registered):** adding 12,522 photos from 147 hospitals raised DeepDRiD sensitivity to 94.9% (false all-clears 46 → 3) but cut specificity to 78.2%, with 81 near-copies of DeepDRiD photos among them: it failed 2 of 5 pre-set tests, so v1 stays the demo model (appendix).
 - **Worse photos (stress test):** on external photos sensitivity fell to 10.6% at worst (blur, strong), yet with the quality check false all-clears stayed at 51 or fewer, against up to 161 without it; strong compression cut specificity to 35.9% (appendix).
-- **Where it fails:** [TEAM_TO_WRITE(where_it_fails): two missed eyes from results/missed_external.png (or the team-only APTOS gallery) and the reason you see in each, e.g. blur, small lesions near the edge, or a grade you would dispute]
-- **What we learned:** [TEAM_TO_WRITE(what_we_learned): two or three sentences on what surprised you, e.g. how the external photos, the poor-quality photos or the stress test changed what you believed, and what you would do differently]
+- **Where it fails:** Photo 4 in results/missed_external.png (expert grade 3): we think it was missed because darkness and haze hide severe lesions in a poor-quality scan. Photo 8 (expert grade 2): we think bottom glare and tiny red lesions blending into clear vessels hid the disease.
+- **What we learned:** It surprised us how sharply sensitivity dropped on new hospital cameras (56.1% versus 84.2%), while our quality check proved essential on degraded scans. Next time, we would calibrate the referral threshold on local clinic photos first and train on diverse cameras.
 
-**Limitations.** Not tested on Pakistani patients or low-cost cameras; the stress test only imitates worse photos. APTOS grades come from single graders. Unlike the commercial tools, we do not detect macular oedema, use one photo per eye instead of two, and have no prospective trial. No age or sex is recorded, so we compared hospital sources and photo quality instead (appendix).
+**Limitations.** Not tested on Pakistani patients or low-cost cameras; the stress test only imitates worse photos. APTOS grades come from single graders. Unlike the commercial tools, we do not detect macular oedema, use one photo per eye and have no prospective trial. No age or sex is recorded; we compared hospital sources and photo quality (appendix).
 
 ## What we'd do next
 1. Test the frozen tool on the expert-graded Pakistani dataset registered at Al-Ibrahim Eye Hospital, Karachi (50,000 patients planned, NCT06287645), then in a primary-care clinic that already screens.

@@ -25,13 +25,16 @@ Say what would need to be true, and how you would test it. -->
 <!-- OWNER: Laziza (task L1). REQUIRED. Look at results/missed_cases.png and results/missed_external.png.
 For two missed eyes: which photo, and the likely reason (blur, small lesions, lesion at the edge, dark photo, a grade you would dispute).
 Limit 55 words. -->
+Photo 4 in results/missed_external.png (expert grade 3): we think it was missed because darkness and haze hide severe lesions in a poor-quality scan. Photo 8 (expert grade 2): we think bottom glare and tiny red lesions blending into clear vessels hid the disease.
 
 ## what_we_learned
 <!-- OWNER: Laziza (task L1), with the team. REQUIRED (the guide lists its absence as a common mistake).
 Two or three sentences: what surprised you (external photos, poor photos, the stress test) and what you would do differently. Limit 50 words. -->
+It surprised us how sharply sensitivity dropped on new hospital cameras (56.1% versus 84.2%), while our quality check proved essential on degraded scans. Next time, we would calibrate the referral threshold on local clinic photos first and train on diverse cameras.
 
 ## video_miss_reason
 <!-- OWNER: Laziza. REQUIRED for the video script. The main reason for misses, in a few words, e.g. "small lesions near the edge of the photo". Limit 12 words. -->
+tiny lesions hidden by shadows, glare, and camera shifts
 
 ## ai_tools
 <!-- OWNER: everyone. REQUIRED (rules: cite every AI tool). List every assistant each of you used and what for,

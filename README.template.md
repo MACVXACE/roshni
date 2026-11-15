@@ -30,7 +30,7 @@ Our own idea (track 4.1.4), not one of the suggested projects.
 - **Baselines:** colour histogram, and untuned pretrained features, each + logistic regression, thresholded the same way.
 
 ## Results
-Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FROM_RESULTS_JSON: derived.aptos_test_referable | int] referable) and the external DeepDRiD set:
+Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FROM_RESULTS_JSON: derived.aptos_test_referable | int] referable) and external DeepDRiD:
 
 [FROM_RESULTS_JSON: table.main]
 
@@ -41,7 +41,7 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 - **Where it fails:** [TEAM_TO_WRITE(where_it_fails): two missed eyes from results/missed_external.png (or the team-only APTOS gallery) and the reason you see in each, e.g. blur, small lesions near the edge, or a grade you would dispute]
 - **What we learned:** [TEAM_TO_WRITE(what_we_learned): two or three sentences on what surprised you, e.g. how the external photos, the poor-quality photos or the stress test changed what you believed, and what you would do differently]
 
-**Limitations.** Not tested on Pakistani patients or low-cost cameras; the stress test only imitates worse photos. APTOS grades come from single graders. Unlike the commercial tools, we do not detect macular oedema, use one photo per eye instead of two, and have no prospective trial. No age or sex is recorded, so we compared hospital sources and photo quality instead (appendix).
+**Limitations.** Not tested on Pakistani patients or low-cost cameras; the stress test only imitates worse photos. APTOS grades come from single graders. Unlike the commercial tools, we do not detect macular oedema, use one photo per eye and have no prospective trial. No age or sex is recorded; we compared hospital sources and photo quality (appendix).
 
 ## What we'd do next
 <!-- team:next_steps -->1. Test the frozen tool on the expert-graded Pakistani dataset registered at Al-Ibrahim Eye Hospital, Karachi (50,000 patients planned, NCT06287645), then in a primary-care clinic that already screens.

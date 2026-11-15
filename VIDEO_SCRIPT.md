@@ -20,4 +20,4 @@ We froze every threshold before testing. On 352 unseen Indian photos, Roshni cau
 ## 1:45 to 2:00 · Zainab · Limits and next step
 *(On screen: results/missed_external.png, then the limits slide. Both show only DeepDRiD photos, which may be shared with credit; keep APTOS photos off the public video.)*
 
-It still misses disease, mostly [TEAM_TO_WRITE(video_miss_reason): the main reason found in the missed photos, in a few words], and we had no Pakistani photos to test on. Next, we would test it in a Pakistani clinic, with low-cost cameras. Roshni is a prototype, not medical advice.
+It still misses disease, mostly tiny lesions hidden by shadows, glare, and camera shifts, and we had no Pakistani photos to test on. Next, we would test it in a Pakistani clinic, with low-cost cameras. Roshni is a prototype, not medical advice.
