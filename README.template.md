@@ -85,6 +85,28 @@ Held-out APTOS test ([FROM_RESULTS_JSON: derived.aptos_test_n | int] photos, [FR
 
 ## Appendix: technical details
 
+**How it works, end to end (everything runs inside the browser; the photo is never uploaded)**
+
+```mermaid
+flowchart LR
+  A["Retinal photo<br/>(clinic camera or file)"] --> B["Crop the black border,<br/>resize to 384 px<br/>(same arithmetic as Python)"]
+  B --> C["EfficientNet-B0<br/>ONNX Runtime Web (WebAssembly)"]
+  C --> D["Referable score<br/>P(grade 2 or worse)"]
+  C --> E["Image features"]
+  E --> F["Quality check<br/>(logistic regression)"]
+  C --> H["Grad-CAM heat map"]
+  D --> G{"Decision rule<br/>(thresholds frozen<br/>before testing)"}
+  F --> G
+  G -->|"score at or above [FROM_RESULTS_JSON: frozen.ref_threshold | .3f]"| R["REFER"]
+  G -->|"otherwise, poor photo"| T["RETAKE"]
+  G -->|"otherwise"| S["RESCREEN"]
+  R --> N["Note for the doctor<br/>in English and Urdu"]
+  T --> N
+  S --> N
+```
+
+After the first visit, a service worker keeps the page, the model and the runtime on the device, so screening also works with no internet.
+
 **How this maps to the Round 1 rubric** (highschoolhackathon.org/judges)
 
 | Criterion (points) | Evidence in this project |

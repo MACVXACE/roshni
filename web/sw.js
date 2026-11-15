@@ -1,7 +1,7 @@
 /* Roshni offline support: after the first visit, the page, the model and ONNX Runtime are kept on the device,
    so screening works with no internet. VERSION is rewritten by export_web.py from a hash of every demo file, so any change
    (model, config, page, examples) replaces the old cache in one step. Edit a file by hand? Change VERSION too. */
-const VERSION = "roshni-b56311a2e3b7";
+const VERSION = "roshni-81876f56e71e";
 const CORE = ["./", "index.html", "roshni.js", "roshni_web.json", "model.onnx", "manifest.json",
               "icons/icon-192.png", "icons/icon-512.png",
               "ort/ort.wasm.min.js", "ort/ort-wasm-simd-threaded.mjs", "ort/ort-wasm-simd-threaded.wasm"];

@@ -405,7 +405,12 @@ if (typeof window !== "undefined") {
         for (const k of Object.keys(NOTE_UZ)) if (cfg.report[k]) cfg.report[k].uz = NOTE_UZ[k];
       }
       ort.env.wasm.numThreads = 1;
-      session = await ort.InferenceSession.create("model.onnx", { executionProviders: ["wasm"] });
+      // First visit downloads about 31 MB (model + runtime) once; show how far it has got, so a slow
+      // connection does not look like a frozen page. Later visits load from this device's cache.
+      const [modelBytes, wasmBytes] = await fetchAll(["model.onnx", "ort/ort-wasm-simd-threaded.wasm"],
+                                                    pct => setStatus("loading", ` ${pct}%`));
+      ort.env.wasm.wasmBinary = wasmBytes.buffer;
+      session = await ort.InferenceSession.create(modelBytes, { executionProviders: ["wasm"] });
       buildLanguagePicker();
       buildExamples();
       buildFooter();
@@ -416,6 +421,35 @@ if (typeof window !== "undefined") {
       setStatus("errModel", e.message);
       console.error(e);
     }
+  }
+
+  /* Download several files together and report one combined percentage. Chunks are collected and joined at the
+     end, so a missing or compressed Content-Length can never break the download (the percentage then just stays hidden). */
+  async function fetchAll(urls, onPct) {
+    const resps = await Promise.all(urls.map(async u => {
+      const r = await fetch(u);
+      if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`);
+      return r;
+    }));
+    const totals = resps.map(r => +r.headers.get("Content-Length") || 0);
+    const total = totals.every(t => t > 0) ? totals.reduce((a, b) => a + b, 0) : 0;
+    let got = 0, last = -1;
+    return Promise.all(resps.map(async r => {
+      if (!r.body || !total) return new Uint8Array(await r.arrayBuffer());
+      const reader = r.body.getReader(), parts = [];
+      let n = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        parts.push(value); n += value.length; got += value.length;
+        const pct = Math.min(99, Math.floor(100 * got / total));
+        if (pct !== last) { last = pct; onPct(pct); }
+      }
+      const out = new Uint8Array(n);
+      let o = 0;
+      for (const p of parts) { out.set(p, o); o += p.length; }
+      return out;
+    }));
   }
 
   /* Keep the page, model and runtime on this device so screening works with no internet next time. */
