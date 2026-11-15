@@ -6,6 +6,9 @@
 <title>Roshni · The story</title>
 <meta name="description" content="Roshni: an open, offline diabetic-retinopathy triage prototype for primary care in Pakistan. A research prototype, not a medical device.">
 <meta name="theme-color" content="#06080b">
+<meta property="og:title" content="Roshni: open, offline diabetic eye triage">
+<meta property="og:description" content="A research prototype for primary-care clinics in Pakistan. Not a medical device.">
+<meta property="og:image" content="https://macvxace.github.io/roshni/docs/roshni_demo.png">
 <link rel="icon" href="../web/icons/icon-192.png">
 <style>
   /* Roshni story page. Self-contained: no libraries, fonts or outside files.
@@ -39,7 +42,8 @@
   .grain { position:absolute; inset:-50%; opacity:.06; pointer-events:none; background-image:radial-gradient(rgba(255,255,255,.9) .6px, transparent .7px); background-size:3px 3px; }
 
   /* chrome */
-  header.bar { position:fixed; top:0; inset-inline:0; z-index:10; display:flex; justify-content:space-between; align-items:center; padding:20px 28px; mix-blend-mode:normal; }
+  header.bar { position:fixed; top:0; inset-inline:0; z-index:10; display:flex; justify-content:space-between; align-items:center; padding:20px 28px 26px; mix-blend-mode:normal;
+    background:linear-gradient(rgba(6,8,11,.96) 0%, rgba(6,8,11,.9) 62%, rgba(6,8,11,0) 100%); }   /* text scrolling underneath stays readable */
   .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
   .logo i { width:22px; height:22px; border-radius:50%; border:1.5px solid var(--light); position:relative; }
   .logo i::after { content:""; position:absolute; inset:6px; border-radius:50%; background:var(--light); box-shadow:0 0 14px var(--light); }
@@ -123,7 +127,7 @@
     .cue { display:none; }
     .chap { display:none; }
     .grid { grid-template-columns:1fr; }
-    header.bar { padding:14px 20px; background:linear-gradient(rgba(6,8,11,.95),rgba(6,8,11,0)); }
+    header.bar { padding:14px 20px 20px; }
     .hero h1 { font-size:clamp(3rem,15vw,4.4rem); }
     .stats { gap:14px 22px; margin-top:24px; }
     .stats div { min-width:0; flex:1 1 28%; }
