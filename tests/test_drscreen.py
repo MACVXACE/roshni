@@ -192,3 +192,25 @@ def test_local_calibration_keeps_patients_apart_and_scores_workflow(tmp_path):
     assert 0 <= s["sensitivity"]["median"] <= 1 and s["draws"] > 0
     assert s["sensitivity"]["median"] >= out["frozen"]["sensitivity"]   # a lower, locally set cut-off catches more
     assert (tmp_path / "local_calibration.png").exists()
+
+
+def test_oiaddr_loader_reads_txt_csv_and_class_folders(tmp_path):
+    import pandas as pd
+    from PIL import Image
+    import run_dr
+    img = Image.new("RGB", (32, 32), (120, 60, 30))
+    (tmp_path / "A" / "train").mkdir(parents=True)
+    (tmp_path / "B").mkdir()
+    lines = []
+    for i in range(120):
+        img.save(tmp_path / "A" / "train" / f"p{i}.jpg")
+        lines.append(f"p{i}.jpg {i % 6}")
+        d = tmp_path / "C" / str(i % 6)
+        d.mkdir(parents=True, exist_ok=True)
+        img.save(d / f"q{i}.jpg")
+        img.save(tmp_path / "B" / f"r{i}.jpg")
+    (tmp_path / "A" / "train.txt").write_text("\n".join(lines))
+    pd.DataFrame({"id_code": [f"r{i}" for i in range(120)], "diagnosis": [i % 6 for i in range(120)]}).to_csv(tmp_path / "B" / "labels.csv", index=False)
+    for sub in ("A", "B", "C"):
+        df = run_dr.load_oiaddr(str(tmp_path / sub), log=lambda *a: None)
+        assert len(df) == 100 and df.grade.between(0, 4).all()    # grade 5 (ungradable) dropped

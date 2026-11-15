@@ -14,7 +14,7 @@ import zipfile
 
 CODE = ["drscreen.py", "run_dr.py", "app.py", "fill_report.py", "export_web.py", "local_calibration.py", "build_notebook.py",
         "check_submission.py", "prepare_publish.py", "make_video.py", "requirements.txt",
-        "Roshni_DR_Screening.ipynb", "Roshni_Results.ipynb", "build_results_notebook.py", "LICENSE", ".gitignore", "README.template.md", "VIDEO_SCRIPT.template.md", "TEAM_INPUTS.md"]
+        "Roshni_DR_Screening.ipynb", "Roshni_Results.ipynb", "PREREGISTRATION_v2.md", "build_v2_notebook.py", "Roshni_v2_OIA-DDR.ipynb", "build_results_notebook.py", "LICENSE", ".gitignore", "README.template.md", "VIDEO_SCRIPT.template.md", "TEAM_INPUTS.md"]
 SKIP_RESULTS = {"missed_cases.png", "false_alarms.png", "gradcam.png"}
 
 

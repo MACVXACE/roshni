@@ -193,6 +193,7 @@ Held-out APTOS test (352 photos, 152 referable) and the external DeepDRiD set:
 | `Roshni_DR_Screening.ipynb` | The full training run on a free Kaggle GPU (the experiment itself ran in 11 minutes): data, near-duplicate split, baselines, training, frozen thresholds, external test, quality check, stress test, CPU timing, web export |
 | `drscreen.py` | The core: preprocessing, model, metrics, the decision rule, stress-test changes, Grad-CAM, the English and Urdu note |
 | `run_dr.py` | The experiment, end to end; writes everything in `results/` |
+| `PREREGISTRATION_v2.md`, `Roshni_v2_OIA-DDR.ipynb` | v2: the same pipeline with the OIA-DDR photos (147 hospitals, 42 camera models) added to training, with its success tests fixed and committed before it was run |
 | `local_calibration.py` | Re-setting the cut-off on a small local sample (added after the external result; needs no GPU) |
 | `results/` | Outputs of the run: `results.json`, per-photo predictions, the model (`model_best.pt`) and quality check (`quality_gate.pkl`), figures (no APTOS photos) |
 | `web/` | The browser demo (ONNX Runtime Web; works offline after the first visit); `export_web.py` builds it from the run |

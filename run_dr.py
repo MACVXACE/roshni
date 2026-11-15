@@ -31,6 +31,7 @@ class RunConfig:
     aptos_csv: str
     aptos_dir: str
     ddr_root: str | None = None
+    oiaddr_root: str | None = None       # v2 only: OIA-DDR (Li et al. 2019) photos added to training and validation
     out: str = "results"
     cache: str = "cache"
     size: int = 384
@@ -62,6 +63,58 @@ def load_aptos(csv, img_dir):
     if missing:
         raise FileNotFoundError(f"{missing} APTOS images not found under {img_dir}")
     return df.rename(columns={"diagnosis": "grade"})[["id_code", "path", "grade"]]
+
+
+IMG_EXT = (".jpg", ".jpeg", ".png", ".tif", ".tiff")
+
+
+def load_oiaddr(root, log=print):
+    """OIA-DDR grading photos (Li et al. 2019; 147 hospitals, 42 camera models; CC BY-NC-SA 4.0), from whatever folder
+    layout the copy has. Labels are read from, in order: '<image> <grade>' text files, CSV files with an image column
+    and a grade column, or class folders named 0 to 5. Grade 5 (ungradable) is dropped. Our own split is used later."""
+    import re
+    index = {}
+    for d, _, fs in os.walk(root):
+        for f in fs:
+            if f.lower().endswith(IMG_EXT):
+                index.setdefault(f, os.path.join(d, f))
+                index.setdefault(os.path.splitext(f)[0], os.path.join(d, f))
+    labels = {}
+    for d, _, fs in os.walk(root):
+        for f in fs:
+            p = os.path.join(d, f)
+            if f.lower().endswith(".txt"):
+                for line in open(p, errors="ignore"):
+                    m = re.match(r"^\s*(\S+\.(?:jpg|jpeg|png|tif|tiff))\s+(\d)\s*$", line, re.I)
+                    if m:
+                        labels.setdefault(os.path.basename(m.group(1)), int(m.group(2)))
+            elif f.lower().endswith(".csv"):
+                try:
+                    c = pd.read_csv(p)
+                except Exception:  # noqa: BLE001
+                    continue
+                gcol = next((k for k in c.columns if str(k).lower() in ("diagnosis", "label", "grade", "level", "dr_grade", "class")), None)
+                icol = next((k for k in c.columns if c[k].astype(str).map(lambda v: v in index).mean() > 0.5), None)
+                if gcol is not None and icol is not None:
+                    for i, g in zip(c[icol].astype(str), c[gcol]):
+                        if str(g).strip().isdigit():
+                            labels.setdefault(os.path.basename(index[i]) if i in index else i, int(g))
+    how = "label files"
+    if not labels:          # class folders: .../0/x.jpg ... .../5/y.jpg
+        how = "class folders"
+        for k, p in index.items():
+            parent = os.path.basename(os.path.dirname(p))
+            if parent.isdigit() and os.path.splitext(k)[1]:
+                labels.setdefault(k, int(parent))
+    rows = [dict(id_code=k, path=index[k], grade=g) for k, g in labels.items() if k in index]
+    df = pd.DataFrame(rows, columns=["id_code", "path", "grade"]).drop_duplicates("path")
+    n_all = len(df)
+    df = df[df.grade.between(0, 4)].reset_index(drop=True)
+    log(f"OIA-DDR: {n_all} labelled photos found under {root} (from {how}); {n_all - len(df)} ungradable dropped; "
+        f"grades {df.grade.value_counts().sort_index().to_dict()}")
+    if len(df) < 100:
+        raise FileNotFoundError(f"Fewer than 100 labelled OIA-DDR photos found under {root}: check the dataset is attached")
+    return df
 
 
 def load_deepdrid(root, part):
@@ -235,6 +288,22 @@ def run(cfg: RunConfig, log=print) -> dict:
     log(ap.groupby("split")["grade"].value_counts().unstack(fill_value=0).to_string())
     tr, va, te = (ap[ap.split == s].reset_index(drop=True) for s in ("train", "val", "test"))
     ybin = lambda d: (d["grade"].to_numpy() >= ds.REFERABLE_FROM).astype(int)
+    ox = None
+    if cfg.oiaddr_root:      # v2: more cameras in training and validation; APTOS test and DeepDRiD unchanged
+        ox = load_oiaddr(cfg.oiaddr_root, log)
+        if cfg.max_images:
+            ox = pd.concat([d.head(max(2, cfg.max_images // 5)) for _, d in ox.groupby("grade")]).reset_index(drop=True)
+        ox["cached"] = ds.cache_images(list(ox["path"]), os.path.join(cfg.cache, f"oiaddr_{cfg.size}"), cfg.size, max(1, cfg.workers))
+        g2, p2 = ds.duplicate_groups(list(ox["cached"]), cfg.dup_max_dist)
+        ox["dup_group"] = g2
+        ox["split"] = ds.group_split(ox["grade"].to_numpy(), g2, cfg.seed)
+        ox.to_csv(os.path.join(cfg.out, "oiaddr_split.csv"), index=False)
+        out["oiaddr"] = dict(photos=len(ox), near_duplicate_pairs=len(p2),
+                             split=ox.split.value_counts().to_dict(), grades=ox.grade.value_counts().sort_index().to_dict())
+        log("OIA-DDR split:\n" + ox.groupby("split")["grade"].value_counts().unstack(fill_value=0).to_string())
+        tr = pd.concat([tr.assign(source="APTOS"), ox[ox.split == "train"].assign(source="OIA-DDR")], ignore_index=True)
+        va = pd.concat([va.assign(source="APTOS"), ox[ox.split == "val"].assign(source="OIA-DDR")], ignore_index=True)
+        log(f"Training photos: {len(tr)} (APTOS + OIA-DDR); validation photos: {len(va)} (both sources)")
 
     # 2. Baselines
     results = {}
@@ -283,6 +352,16 @@ def run(cfg: RunConfig, log=print) -> dict:
     log(f"APTOS test: AUC {results['fine_tuned']['AUC']:.3f}, sensitivity {results['fine_tuned']['sensitivity']:.3f}, "
         f"specificity {results['fine_tuned']['specificity']:.3f}, missed {results['fine_tuned']['missed_FN']}")
 
+    if ox is not None:      # OIA-DDR held-out test: new photos from the same hospitals as its training part
+        ot = ox[ox.split == "test"].reset_index(drop=True)
+        Po = ds.predict(model, ds.make_dataset(list(ot["cached"]), None, cfg.size, False), cfg.batch_size, workers=cfg.workers)
+        ot["p_referable"] = ds.referable_prob(Po)
+        results["oiaddr_test"] = ds.binary_report(ybin(ot), ot["p_referable"].to_numpy(), ref_thr, "Fine-tuned, OIA-DDR test (China)")
+        ot.drop(columns=["path", "cached"]).to_csv(os.path.join(cfg.out, "oiaddr_test_predictions.csv"), index=False)
+        curves_te.append(("Fine-tuned (OIA-DDR test, China)", ybin(ot), ot["p_referable"].to_numpy(), ref_thr, C_PROBE))
+        log(f"OIA-DDR test: AUC {results['oiaddr_test']['AUC']:.3f}, sensitivity {results['oiaddr_test']['sensitivity']:.3f}, "
+            f"specificity {results['oiaddr_test']['specificity']:.3f}")
+
     # 5. External: DeepDRiD (never used to train the DR model or to set its threshold)
     if cfg.ddr_root:
         dd = pd.concat([load_deepdrid(cfg.ddr_root, "training"), load_deepdrid(cfg.ddr_root, "validation")], ignore_index=True)
@@ -290,11 +369,24 @@ def run(cfg: RunConfig, log=print) -> dict:
         Pd, Ed = ds.predict(model, ds.make_dataset(list(dd["cached"]), None, cfg.size, False), cfg.batch_size,
                             workers=cfg.workers, with_embeddings=True)
         dd["p_referable"] = ds.referable_prob(Pd)
+        dd["near_copy_in_training"] = False
+        if ox is not None:      # DeepDRiD must stay unseen: look for near-copies among the OIA-DDR photos used
+            used = ox[ox.split.isin(["train", "val"])]
+            Hd = np.stack([ds.dhash(p) for p in dd["cached"]]).astype(np.float32)
+            Ho = np.stack([ds.dhash(p) for p in used["cached"]]).astype(np.float32)
+            dist = Hd.shape[1] - (Hd @ Ho.T + (1 - Hd) @ (1 - Ho).T)
+            dd["near_copy_in_training"] = (dist <= cfg.dup_max_dist).any(1)
+            out["deepdrid_near_copies_in_oiaddr"] = int(dd["near_copy_in_training"].sum())
+            log(f"DeepDRiD photos with a near-copy among the OIA-DDR photos used: {out['deepdrid_near_copies_in_oiaddr']}")
         graded = dd["grade"] <= 4
         g = dd[graded]
         rep = ds.binary_report(ybin(g), g["p_referable"].to_numpy(), ref_thr, "Fine-tuned, external DeepDRiD (China)")
         rep["AUC_CI_by_patient"] = _patient_bootstrap_auc(ybin(g), g["p_referable"].to_numpy(), g["patient_id"].to_numpy())
         results["external_all"] = rep
+        if dd["near_copy_in_training"].any():
+            gc = g[~g["near_copy_in_training"]]
+            results["external_no_near_copies"] = ds.binary_report(ybin(gc), gc["p_referable"].to_numpy(), ref_thr,
+                                                                  "External DeepDRiD, near-copies of training photos removed")
         for q, name in ((0, "good"), (1, "poor")):
             gq = g[g.poor_quality == q]
             if len(gq) and len(set(ybin(gq))) > 1:
@@ -413,7 +505,8 @@ if __name__ == "__main__":
     a = argparse.ArgumentParser()
     a.add_argument("--aptos-csv", required=True)
     a.add_argument("--aptos-dir", required=True)
-    a.add_argument("--ddr-root", default=None)
+    a.add_argument("--ddr-root", default=None, help="DeepDRiD (external test)")
+    a.add_argument("--oiaddr-root", default=None, help="v2 only: OIA-DDR photos added to training and validation")
     a.add_argument("--out", default="results")
     a.add_argument("--epochs", type=int, default=12)
     a.add_argument("--size", type=int, default=384)
@@ -421,6 +514,7 @@ if __name__ == "__main__":
     a.add_argument("--max-images", type=int, default=None)
     a.add_argument("--workers", type=int, default=2)
     x = a.parse_args()
-    r = run(RunConfig(x.aptos_csv, x.aptos_dir, x.ddr_root, x.out, size=x.size, epochs=x.epochs,
-                      pretrained=not x.no_pretrained, max_images=x.max_images, workers=x.workers))
+    r = run(RunConfig(aptos_csv=x.aptos_csv, aptos_dir=x.aptos_dir, ddr_root=x.ddr_root, oiaddr_root=x.oiaddr_root,
+                      out=x.out, size=x.size, epochs=x.epochs, pretrained=not x.no_pretrained,
+                      max_images=x.max_images, workers=x.workers))
     print(r["summary"].to_string(index=False))
