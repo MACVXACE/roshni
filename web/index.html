@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roshni: diabetic eye screening that runs on your device</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2f6fdb">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+  :root { --ink:#1f2328; --muted:#5b6470; --line:#e1e4e8; --bg:#fafbfc; --accent:#2f6fdb; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Naskh Arabic","Noto Sans Devanagari",sans-serif; color:var(--ink); background:#fff; }
+  header, main, footer { max-width:1040px; margin:0 auto; padding:0 20px; }
+  header { padding-top:28px; }
+  h1 { font-size:1.6rem; margin:0 0 6px; letter-spacing:-0.01em; }
+  .lede { color:var(--muted); margin:0 0 6px; max-width:760px; }
+  .warn { display:inline-block; font-size:.85rem; background:#fff4e5; color:#7a4100; border-radius:6px; padding:4px 10px; margin:8px 0 18px; }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:24px; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+  .panel { border:1px solid var(--line); border-radius:10px; padding:16px; background:#fff; }
+  .panel h2 { font-size:1rem; margin:0 0 10px; }
+  label.pick { display:block; border:2px dashed var(--line); border-radius:10px; padding:18px; text-align:center; cursor:pointer; background:var(--bg); }
+  label.pick:hover { border-color:var(--accent); }
+  #file { display:block; margin:8px auto 0; }
+  #status { color:var(--muted); font-size:.9rem; min-height:1.4em; margin:10px 0; }
+  #langs label { margin-right:14px; font-size:.95rem; white-space:nowrap; }
+  #examples { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .ex { border:1px solid var(--line); background:#fff; border-radius:8px; padding:4px; width:120px; cursor:pointer; text-align:left; font:inherit; }
+  .ex img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:5px; display:block; }
+  .ex span { display:block; font-size:.72rem; color:var(--muted); margin-top:3px; line-height:1.25; }
+  #excredit { font-size:.75rem; color:var(--muted); margin-top:6px; }
+  #card { border-left:6px solid var(--line); border-radius:8px; padding:12px 14px; background:var(--bg); }
+  #decision { font-size:1.5rem; font-weight:700; }
+  #scores, #timing { font-size:.9rem; color:var(--muted); margin-top:4px; }
+  .g { display:grid; grid-template-columns: 120px 1fr 44px; align-items:center; gap:8px; font-size:.88rem; margin:3px 0; }
+  .bar { height:10px; background:var(--line); border-radius:5px; overflow:hidden; display:block; }
+  .bar span { display:block; height:100%; background:var(--accent); }
+  .n { margin:8px 0; line-height:1.6; }
+  .n small { color:var(--muted); }
+  .n[dir="rtl"] { font-size:1.08rem; }
+  canvas { width:100%; max-width:384px; border-radius:8px; display:block; }
+  .imgs { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .cap { font-size:.78rem; color:var(--muted); margin-top:3px; }
+  footer { color:var(--muted); font-size:.85rem; padding-top:20px; padding-bottom:40px; }
+  footer p { margin:6px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Roshni: diabetic eye screening that runs on your device</h1>
+  <p class="lede">For a primary-care diabetes clinic in Pakistan with no eye specialist. Choose one retinal photo; Roshni suggests one next step for the doctor to confirm: <b>refer</b>, <b>retake the photo</b>, or <b>rescreen in 12 months</b>. A poor photo never gets an all-clear, and never blocks a referral.</p>
+  <p class="lede">Everything runs inside this browser. <b>The photo is never uploaded</b>, and after the first visit it works without internet.</p>
+  <span class="warn">Prototype for a student hackathon. Not medical advice and not a diagnosis.</span>
+</header>
+<main>
+  <div class="grid">
+    <section class="panel">
+      <h2>1. Choose a retinal photo</h2>
+      <label class="pick">Tap to take or choose a fundus photo
+        <input id="file" type="file" accept="image/*" disabled>
+      </label>
+      <div id="status">Loading…</div>
+      <div id="offline" class="cap"></div>
+      <h2 style="margin-top:14px">Or try an example</h2>
+      <div id="examples"></div>
+      <div id="excredit"></div>
+      <h2 style="margin-top:16px">Languages on the note</h2>
+      <div id="langs"></div>
+    </section>
+    <section class="panel">
+      <h2>2. Suggested next step</h2>
+      <div id="card" hidden>
+        <div id="decision"></div>
+        <div id="scores"></div>
+        <div id="timing"></div>
+      </div>
+      <div id="notebox" hidden>
+        <h2 style="margin-top:14px">Note for the doctor and patient</h2>
+        <div id="note"></div>
+      </div>
+      <div id="heatbox" hidden>
+        <h2 style="margin-top:14px">Where the model looked</h2>
+        <div class="imgs">
+          <div><canvas id="photo"></canvas><div class="cap">Photo as the model sees it</div></div>
+          <div><canvas id="heat"></canvas><div class="cap">Heat map (Grad-CAM) for referable disease</div></div>
+        </div>
+        <h2 style="margin-top:14px">Estimated severity</h2>
+        <div id="grades"></div>
+      </div>
+    </section>
+  </div>
+</main>
+<footer>
+  <p id="results"></p>
+  <p id="thr"></p>
+  <p>Model: EfficientNet-B0 fine-tuned on APTOS 2019 (India), tested on DeepDRiD (China). Not tested on Pakistani patients or low-cost cameras. Does not detect macular oedema.</p>
+  <p><a id="repo" hidden>Code, results and limitations</a></p>
+</footer>
+<script src="ort/ort.wasm.min.js"></script>
+<script src="roshni.js"></script>
+</body>
+</html>

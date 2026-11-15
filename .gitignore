@@ -1,0 +1,11 @@
+# data and caches (never commit APTOS images: the competition's rules forbid sharing them)
+cache/
+DeepDRiD/
+aptos2019-blindness-detection/
+*.zip
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store

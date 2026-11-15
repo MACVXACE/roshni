@@ -1,0 +1,12 @@
+# Training ran on Kaggle (GPU). The results notebook and tests were verified on a CPU with the versions in brackets.
+torch                # (2.15.0)
+torchvision          # (0.29.2)
+numpy                # (2.5.3)
+pandas               # (3.0.5)
+scikit-learn>=1.2    # (1.9.1; the saved quality check was made with 1.6.1 and still reproduces)
+Pillow               # (12.3.0)
+matplotlib           # (3.11.2)
+onnx                 # (1.23.2)
+onnxruntime          # (1.29.0)
+gradio               # (6.32.0) only for the optional app.py
+pytest               # (9.1.1)

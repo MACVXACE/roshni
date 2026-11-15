@@ -1,0 +1,643 @@
+{
+  "config": {
+    "aptos_csv": "/kaggle/input/competitions/aptos2019-blindness-detection/train.csv",
+    "aptos_dir": "/kaggle/input/competitions/aptos2019-blindness-detection/train_images",
+    "ddr_root": "DeepDRiD",
+    "out": "results",
+    "cache": "cache",
+    "size": 384,
+    "arch": "efficientnet_b0",
+    "pretrained": true,
+    "epochs": 12,
+    "lr": 0.0003,
+    "batch_size": 32,
+    "workers": 4,
+    "target_sensitivity": 0.9,
+    "poor_threshold": 0.5,
+    "dup_max_dist": 10,
+    "seed": 0,
+    "max_images": null
+  },
+  "duplicates": {
+    "pairs": 1457,
+    "pairs_with_different_grades": 118,
+    "images_in_groups": 154
+  },
+  "frozen": {
+    "arch": "efficientnet_b0",
+    "size": 384,
+    "ref_threshold": 0.6139345765113831,
+    "poor_threshold": 0.5,
+    "target_sensitivity": 0.9
+  },
+  "aptos_grades": {
+    "QWK": 0.8889463557936984,
+    "confusion": [
+      [
+        153,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        32,
+        15,
+        0,
+        0
+      ],
+      [
+        2,
+        11,
+        87,
+        2,
+        0
+      ],
+      [
+        0,
+        0,
+        10,
+        3,
+        4
+      ],
+      [
+        0,
+        3,
+        11,
+        1,
+        18
+      ]
+    ],
+    "per_grade": {
+      "No DR": {
+        "n": 153
+      },
+      "Mild": {
+        "n": 47
+      },
+      "Moderate": {
+        "n": 102
+      },
+      "Severe": {
+        "n": 17
+      },
+      "Proliferative": {
+        "n": 33
+      }
+    },
+    "mean_referable_prob_by_grade": [
+      0.03467933088541031,
+      0.394711434841156,
+      0.7939143180847168,
+      0.9502326846122742,
+      0.867371141910553
+    ]
+  },
+  "aptos_flagged_by_grade": [
+    {
+      "grade": "0 No DR",
+      "photos": 153,
+      "sent_to_specialist": 0,
+      "share_sent": 0.0
+    },
+    {
+      "grade": "1 Mild",
+      "photos": 47,
+      "sent_to_specialist": 12,
+      "share_sent": 0.2553191489361702
+    },
+    {
+      "grade": "2 Moderate",
+      "photos": 102,
+      "sent_to_specialist": 82,
+      "share_sent": 0.803921568627451
+    },
+    {
+      "grade": "3 Severe",
+      "photos": 17,
+      "sent_to_specialist": 17,
+      "share_sent": 1.0
+    },
+    {
+      "grade": "4 Proliferative",
+      "photos": 33,
+      "sent_to_specialist": 29,
+      "share_sent": 0.8787878787878788
+    }
+  ],
+  "external_by_source": [
+    {
+      "source": "Nation",
+      "photos": 56,
+      "sensitivity": 0.5416666666666666,
+      "specificity": 0.9375,
+      "missed_FN": 11
+    },
+    {
+      "source": "Nicheng",
+      "photos": 1508,
+      "sensitivity": 0.5584615384615385,
+      "specificity": 0.9743589743589743,
+      "missed_FN": 287
+    },
+    {
+      "source": "Shanghai",
+      "photos": 36,
+      "sensitivity": 0.6538461538461539,
+      "specificity": 0.9,
+      "missed_FN": 9
+    }
+  ],
+  "quality_gate": {
+    "AUC_detecting_poor_photos": 0.7076066135699163,
+    "flagged_share": 0.53,
+    "poor_photos_flagged": 0.6513761467889908,
+    "good_photos_flagged": 0.38461538461538464
+  },
+  "workflow": {
+    "with_quality_gate": {
+      "photos": 400,
+      "REFER": 104,
+      "RETAKE": 154,
+      "RESCREEN": 142,
+      "referable_given_all_clear": 46,
+      "referable_caught_by_retake": 35,
+      "sight_threatening_given_all_clear": 4
+    },
+    "without_quality_gate": {
+      "photos": 400,
+      "REFER": 104,
+      "RETAKE": 0,
+      "RESCREEN": 296,
+      "referable_given_all_clear": 81,
+      "referable_caught_by_retake": 0,
+      "sight_threatening_given_all_clear": 13
+    },
+    "ungradable_photos": 0,
+    "ungradable_sent_to_retake_or_refer": 0
+  },
+  "cpu_speed": {
+    "photos_timed": 20,
+    "median_seconds_per_photo": 0.14694868699996277,
+    "slowest_seconds_per_photo": 0.18626309999990553,
+    "heatmap_median_seconds": 0.42624782500001857,
+    "cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz",
+    "cpu_threads": 2,
+    "parameters": 4013953,
+    "model_file_MB": 16.355321
+  },
+  "stress_test": [
+    {
+      "photos": "APTOS test",
+      "change": "clean",
+      "strength": "none",
+      "level": NaN,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.9775493421052631,
+      "sensitivity": 0.8421052631578947,
+      "specificity": 0.94,
+      "retake_share": 0.2869318181818182,
+      "referable_all_clear_with_check": 15,
+      "referable_all_clear_without_check": 24,
+      "grade3_4_all_clear_with_check": 2,
+      "grade3_4_all_clear_without_check": 4
+    },
+    {
+      "photos": "APTOS test",
+      "change": "blur",
+      "strength": "mild",
+      "level": 1.5,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.9723848684210527,
+      "sensitivity": 0.6710526315789473,
+      "specificity": 0.975,
+      "retake_share": 0.23295454545454544,
+      "referable_all_clear_with_check": 36,
+      "referable_all_clear_without_check": 50,
+      "grade3_4_all_clear_with_check": 6,
+      "grade3_4_all_clear_without_check": 8
+    },
+    {
+      "photos": "APTOS test",
+      "change": "blur",
+      "strength": "strong",
+      "level": 3.0,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.948766447368421,
+      "sensitivity": 0.34868421052631576,
+      "specificity": 0.99,
+      "retake_share": 0.6335227272727273,
+      "referable_all_clear_with_check": 38,
+      "referable_all_clear_without_check": 99,
+      "grade3_4_all_clear_with_check": 7,
+      "grade3_4_all_clear_without_check": 18
+    },
+    {
+      "photos": "APTOS test",
+      "change": "low_resolution",
+      "strength": "mild",
+      "level": 192.0,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.9721217105263158,
+      "sensitivity": 0.7236842105263158,
+      "specificity": 0.965,
+      "retake_share": 0.1875,
+      "referable_all_clear_with_check": 33,
+      "referable_all_clear_without_check": 42,
+      "grade3_4_all_clear_with_check": 7,
+      "grade3_4_all_clear_without_check": 7
+    },
+    {
+      "photos": "APTOS test",
+      "change": "low_resolution",
+      "strength": "strong",
+      "level": 96.0,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.9611019736842106,
+      "sensitivity": 0.5921052631578947,
+      "specificity": 0.975,
+      "retake_share": 0.5880681818181818,
+      "referable_all_clear_with_check": 25,
+      "referable_all_clear_without_check": 62,
+      "grade3_4_all_clear_with_check": 4,
+      "grade3_4_all_clear_without_check": 9
+    },
+    {
+      "photos": "APTOS test",
+      "change": "underexposed",
+      "strength": "mild",
+      "level": 0.6,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.9723190789473684,
+      "sensitivity": 0.881578947368421,
+      "specificity": 0.94,
+      "retake_share": 0.29261363636363635,
+      "referable_all_clear_with_check": 9,
+      "referable_all_clear_without_check": 18,
+      "grade3_4_all_clear_with_check": 1,
+      "grade3_4_all_clear_without_check": 2
+    },
+    {
+      "photos": "APTOS test",
+      "change": "underexposed",
+      "strength": "strong",
+      "level": 0.35,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.964358552631579,
+      "sensitivity": 0.8618421052631579,
+      "specificity": 0.92,
+      "retake_share": 0.3522727272727273,
+      "referable_all_clear_with_check": 7,
+      "referable_all_clear_without_check": 21,
+      "grade3_4_all_clear_with_check": 1,
+      "grade3_4_all_clear_without_check": 4
+    },
+    {
+      "photos": "APTOS test",
+      "change": "compressed",
+      "strength": "mild",
+      "level": 30.0,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.9544243421052632,
+      "sensitivity": 0.993421052631579,
+      "specificity": 0.665,
+      "retake_share": 0.2755681818181818,
+      "referable_all_clear_with_check": 1,
+      "referable_all_clear_without_check": 1,
+      "grade3_4_all_clear_with_check": 0,
+      "grade3_4_all_clear_without_check": 0
+    },
+    {
+      "photos": "APTOS test",
+      "change": "compressed",
+      "strength": "strong",
+      "level": 8.0,
+      "n": 352,
+      "referable": 152,
+      "AUC": 0.8270559210526316,
+      "sensitivity": 0.993421052631579,
+      "specificity": 0.255,
+      "retake_share": 0.12215909090909091,
+      "referable_all_clear_with_check": 0,
+      "referable_all_clear_without_check": 1,
+      "grade3_4_all_clear_with_check": 0,
+      "grade3_4_all_clear_without_check": 0
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "clean",
+      "strength": "none",
+      "level": NaN,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.9279292929292929,
+      "sensitivity": 0.55,
+      "specificity": 0.9772727272727273,
+      "retake_share": 0.385,
+      "referable_all_clear_with_check": 46,
+      "referable_all_clear_without_check": 81,
+      "grade3_4_all_clear_with_check": 4,
+      "grade3_4_all_clear_without_check": 13
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "blur",
+      "strength": "mild",
+      "level": 1.5,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.8965656565656566,
+      "sensitivity": 0.3333333333333333,
+      "specificity": 0.990909090909091,
+      "retake_share": 0.4425,
+      "referable_all_clear_with_check": 51,
+      "referable_all_clear_without_check": 120,
+      "grade3_4_all_clear_with_check": 12,
+      "grade3_4_all_clear_without_check": 38
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "blur",
+      "strength": "strong",
+      "level": 3.0,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.7922222222222222,
+      "sensitivity": 0.10555555555555556,
+      "specificity": 1.0,
+      "retake_share": 0.8175,
+      "referable_all_clear_with_check": 22,
+      "referable_all_clear_without_check": 161,
+      "grade3_4_all_clear_with_check": 7,
+      "grade3_4_all_clear_without_check": 71
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "low_resolution",
+      "strength": "mild",
+      "level": 192.0,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.9123484848484849,
+      "sensitivity": 0.4222222222222222,
+      "specificity": 0.9954545454545455,
+      "retake_share": 0.375,
+      "referable_all_clear_with_check": 50,
+      "referable_all_clear_without_check": 104,
+      "grade3_4_all_clear_with_check": 8,
+      "grade3_4_all_clear_without_check": 28
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "low_resolution",
+      "strength": "strong",
+      "level": 96.0,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.8578030303030303,
+      "sensitivity": 0.17222222222222222,
+      "specificity": 1.0,
+      "retake_share": 0.835,
+      "referable_all_clear_with_check": 18,
+      "referable_all_clear_without_check": 149,
+      "grade3_4_all_clear_with_check": 7,
+      "grade3_4_all_clear_without_check": 62
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "underexposed",
+      "strength": "mild",
+      "level": 0.6,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.9248484848484848,
+      "sensitivity": 0.5888888888888889,
+      "specificity": 0.9727272727272728,
+      "retake_share": 0.285,
+      "referable_all_clear_with_check": 38,
+      "referable_all_clear_without_check": 74,
+      "grade3_4_all_clear_with_check": 2,
+      "grade3_4_all_clear_without_check": 10
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "underexposed",
+      "strength": "strong",
+      "level": 0.35,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.9211616161616161,
+      "sensitivity": 0.5611111111111111,
+      "specificity": 0.9727272727272728,
+      "retake_share": 0.295,
+      "referable_all_clear_with_check": 43,
+      "referable_all_clear_without_check": 79,
+      "grade3_4_all_clear_with_check": 4,
+      "grade3_4_all_clear_without_check": 16
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "compressed",
+      "strength": "mild",
+      "level": 30.0,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.8819696969696968,
+      "sensitivity": 0.6333333333333333,
+      "specificity": 0.9363636363636364,
+      "retake_share": 0.3375,
+      "referable_all_clear_with_check": 39,
+      "referable_all_clear_without_check": 66,
+      "grade3_4_all_clear_with_check": 5,
+      "grade3_4_all_clear_without_check": 12
+    },
+    {
+      "photos": "DeepDRiD validation",
+      "change": "compressed",
+      "strength": "strong",
+      "level": 8.0,
+      "n": 400,
+      "referable": 180,
+      "AUC": 0.6601767676767676,
+      "sensitivity": 0.8277777777777777,
+      "specificity": 0.35909090909090907,
+      "retake_share": 0.185,
+      "referable_all_clear_with_check": 9,
+      "referable_all_clear_without_check": 31,
+      "grade3_4_all_clear_with_check": 2,
+      "grade3_4_all_clear_without_check": 9
+    }
+  ],
+  "results": {
+    "colour_baseline": {
+      "model": "Colour histogram + logistic regression",
+      "n": 352,
+      "referable": 152,
+      "threshold": 0.48937112355568296,
+      "AUC": 0.8477796052631579,
+      "AUC_CI": [
+        0.8085969469582898,
+        0.8863532063364298
+      ],
+      "sensitivity": 0.8421052631578947,
+      "sensitivity_CI": [
+        0.7758035885161538,
+        0.8915406892633351
+      ],
+      "specificity": 0.72,
+      "specificity_CI": [
+        0.6540756858222899,
+        0.7776320715736488
+      ],
+      "PPV": 0.6956521739130435,
+      "NPV": 0.8571428571428571,
+      "missed_FN": 24,
+      "false_alarms_FP": 56,
+      "referred_share": 0.5227272727272727
+    },
+    "linear_probe": {
+      "model": "Pretrained features, not fine-tuned + logistic regression",
+      "n": 352,
+      "referable": 152,
+      "threshold": 0.7357824127396098,
+      "AUC": 0.967516447368421,
+      "AUC_CI": [
+        0.9512997123365191,
+        0.981288157095854
+      ],
+      "sensitivity": 0.8355263157894737,
+      "sensitivity_CI": [
+        0.7684679929264209,
+        0.8860427410496163
+      ],
+      "specificity": 0.935,
+      "specificity_CI": [
+        0.8919799625008207,
+        0.9616240123502404
+      ],
+      "PPV": 0.9071428571428571,
+      "NPV": 0.8820754716981132,
+      "missed_FN": 25,
+      "false_alarms_FP": 13,
+      "referred_share": 0.3977272727272727
+    },
+    "fine_tuned": {
+      "model": "Fine-tuned efficientnet_b0",
+      "n": 352,
+      "referable": 152,
+      "threshold": 0.6139345765113831,
+      "AUC": 0.9775493421052631,
+      "AUC_CI": [
+        0.9650289884339784,
+        0.9876817871522472
+      ],
+      "sensitivity": 0.8421052631578947,
+      "sensitivity_CI": [
+        0.7758035885161538,
+        0.8915406892633351
+      ],
+      "specificity": 0.94,
+      "specificity_CI": [
+        0.8980673646931491,
+        0.9653481500987285
+      ],
+      "PPV": 0.9142857142857143,
+      "NPV": 0.8867924528301887,
+      "missed_FN": 24,
+      "false_alarms_FP": 12,
+      "referred_share": 0.3977272727272727
+    },
+    "external_all": {
+      "model": "Fine-tuned, external DeepDRiD (China)",
+      "n": 1600,
+      "referable": 700,
+      "threshold": 0.6139345765113831,
+      "AUC": 0.9109603174603175,
+      "AUC_CI": [
+        0.8968939477527474,
+        0.9252795243840828
+      ],
+      "sensitivity": 0.5614285714285714,
+      "sensitivity_CI": [
+        0.5244323012401221,
+        0.597754281650119
+      ],
+      "specificity": 0.9722222222222222,
+      "specificity_CI": [
+        0.9593150067600135,
+        0.9811152633227088
+      ],
+      "PPV": 0.9401913875598086,
+      "NPV": 0.7402707275803723,
+      "missed_FN": 307,
+      "false_alarms_FP": 25,
+      "referred_share": 0.26125,
+      "AUC_CI_by_patient": [
+        0.8901059723667678,
+        0.9296528858107774
+      ]
+    },
+    "external_good_photos": {
+      "model": "External, good-quality photos",
+      "n": 758,
+      "referable": 356,
+      "threshold": 0.6139345765113831,
+      "AUC": 0.9358334730840181,
+      "AUC_CI": [
+        0.9161198212200634,
+        0.9520244492870769
+      ],
+      "sensitivity": 0.5449438202247191,
+      "sensitivity_CI": [
+        0.49300900137994264,
+        0.5959190158365215
+      ],
+      "specificity": 0.9925373134328358,
+      "specificity_CI": [
+        0.9782912662160943,
+        0.9974588786680181
+      ],
+      "PPV": 0.9847715736040609,
+      "NPV": 0.7112299465240641,
+      "missed_FN": 162,
+      "false_alarms_FP": 3,
+      "referred_share": 0.2598944591029024
+    },
+    "external_poor_photos": {
+      "model": "External, poor-quality photos",
+      "n": 842,
+      "referable": 344,
+      "threshold": 0.6139345765113831,
+      "AUC": 0.8908833006444381,
+      "AUC_CI": [
+        0.8672606292756564,
+        0.9121509733175271
+      ],
+      "sensitivity": 0.5784883720930233,
+      "sensitivity_CI": [
+        0.5257202676825676,
+        0.6295228084762357
+      ],
+      "specificity": 0.9558232931726908,
+      "specificity_CI": [
+        0.9340197895013095,
+        0.9706481375896291
+      ],
+      "PPV": 0.9004524886877828,
+      "NPV": 0.7665056360708534,
+      "missed_FN": 145,
+      "false_alarms_FP": 22,
+      "referred_share": 0.26247030878859856
+    }
+  },
+  "seconds": 673.639321565628
+}

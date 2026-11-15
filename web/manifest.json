@@ -1,0 +1,14 @@
+{
+  "name": "Roshni: diabetic eye screening",
+  "short_name": "Roshni",
+  "description": "Prototype for a student hackathon. Not medical advice. Screens a retinal photo on this device: refer, retake or rescreen in 12 months.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2f6fdb",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
