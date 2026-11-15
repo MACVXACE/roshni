@@ -276,7 +276,11 @@ def main():
         parts.append(out)
     lst = os.path.join(tmp, "list.txt")
     open(lst, "w").write("".join(f"file '{p}'\n" for p in parts))
-    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", x.out])
+    joined = os.path.join(tmp, "joined.mp4")
+    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", joined])
+    # the rules say "up to 2 minutes": cut to 119.8 s so rounding in the joined parts can never push it over 120 s
+    run(["ffmpeg", "-y", "-i", joined, "-t", "119.8", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+         "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", x.out])
     dur = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", x.out],
                          capture_output=True, text=True).stdout.strip()
     print(f"Wrote {x.out} ({float(dur):.1f} s)")
