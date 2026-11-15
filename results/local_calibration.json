@@ -1,0 +1,214 @@
+{
+  "note": "Added after seeing the external result; the frozen results stay the main results.",
+  "target_sensitivity": 0.9,
+  "evaluation_photos": 400,
+  "evaluation_patients": 100,
+  "calibration_pool_patients": 300,
+  "draws": 500,
+  "frozen": {
+    "threshold": 0.6139345765113831,
+    "sensitivity": 0.55,
+    "specificity": 0.9772727272727273,
+    "REFER": 104,
+    "RETAKE": 154,
+    "RESCREEN": 142,
+    "referable_given_all_clear": 46,
+    "sight_threatening_given_all_clear": 4
+  },
+  "samples": [
+    {
+      "patients": 12,
+      "photos_median": 48,
+      "draws": 500,
+      "skipped_too_little_disease": 0,
+      "sensitivity": {
+        "p10": 0.7166666666666667,
+        "median": 0.9,
+        "p90": 0.9722222222222222
+      },
+      "specificity": {
+        "p10": 0.36363636363636365,
+        "median": 0.7636363636363637,
+        "p90": 0.9454545454545454
+      },
+      "threshold": {
+        "p10": 0.053586446,
+        "median": 0.1318808,
+        "p90": 0.38481086
+      },
+      "referable_given_all_clear": {
+        "p10": 2.0,
+        "median": 9.0,
+        "p90": 28.0
+      },
+      "sight_threatening_given_all_clear": {
+        "p10": 1.0,
+        "median": 1.0,
+        "p90": 2.0
+      },
+      "REFER": {
+        "p10": 141.0,
+        "median": 214.0,
+        "p90": 315.0
+      },
+      "RETAKE": {
+        "p10": 41.0,
+        "median": 98.0,
+        "p90": 135.0
+      },
+      "RESCREEN": {
+        "p10": 44.0,
+        "median": 88.0,
+        "p90": 124.0
+      }
+    },
+    {
+      "patients": 25,
+      "photos_median": 100,
+      "draws": 500,
+      "skipped_too_little_disease": 0,
+      "sensitivity": {
+        "p10": 0.8055555555555556,
+        "median": 0.9222222222222223,
+        "p90": 0.9722222222222222
+      },
+      "specificity": {
+        "p10": 0.45,
+        "median": 0.7454545454545455,
+        "p90": 0.9272727272727272
+      },
+      "threshold": {
+        "p10": 0.06074594,
+        "median": 0.120746106,
+        "p90": 0.25379738
+      },
+      "referable_given_all_clear": {
+        "p10": 2.0,
+        "median": 7.0,
+        "p90": 18.0
+      },
+      "sight_threatening_given_all_clear": {
+        "p10": 1.0,
+        "median": 1.0,
+        "p90": 1.0
+      },
+      "REFER": {
+        "p10": 161.0,
+        "median": 222.0,
+        "p90": 296.0
+      },
+      "RETAKE": {
+        "p10": 48.0,
+        "median": 93.0,
+        "p90": 126.0
+      },
+      "RESCREEN": {
+        "p10": 56.0,
+        "median": 85.0,
+        "p90": 113.0
+      }
+    },
+    {
+      "patients": 50,
+      "photos_median": 200,
+      "draws": 500,
+      "skipped_too_little_disease": 0,
+      "sensitivity": {
+        "p10": 0.8722222222222222,
+        "median": 0.9277777777777778,
+        "p90": 0.9666666666666667
+      },
+      "specificity": {
+        "p10": 0.635909090909091,
+        "median": 0.740909090909091,
+        "p90": 0.8590909090909091
+      },
+      "threshold": {
+        "p10": 0.08291765200000002,
+        "median": 0.11867125,
+        "p90": 0.17526215
+      },
+      "referable_given_all_clear": {
+        "p10": 3.0,
+        "median": 7.0,
+        "p90": 13.0
+      },
+      "sight_threatening_given_all_clear": {
+        "p10": 1.0,
+        "median": 1.0,
+        "p90": 1.0
+      },
+      "REFER": {
+        "p10": 188.0,
+        "median": 224.0,
+        "p90": 254.10000000000002
+      },
+      "RETAKE": {
+        "p10": 71.0,
+        "median": 91.0,
+        "p90": 110.0
+      },
+      "RESCREEN": {
+        "p10": 74.9,
+        "median": 85.0,
+        "p90": 102.0
+      }
+    },
+    {
+      "patients": 100,
+      "photos_median": 400,
+      "draws": 500,
+      "skipped_too_little_disease": 0,
+      "sensitivity": {
+        "p10": 0.8944444444444445,
+        "median": 0.9277777777777778,
+        "p90": 0.9555555555555556
+      },
+      "specificity": {
+        "p10": 0.65,
+        "median": 0.740909090909091,
+        "p90": 0.7954545454545454
+      },
+      "threshold": {
+        "p10": 0.08920641,
+        "median": 0.11723854,
+        "p90": 0.14450651
+      },
+      "referable_given_all_clear": {
+        "p10": 4.0,
+        "median": 7.0,
+        "p90": 10.0
+      },
+      "sight_threatening_given_all_clear": {
+        "p10": 1.0,
+        "median": 1.0,
+        "p90": 1.0
+      },
+      "REFER": {
+        "p10": 206.0,
+        "median": 224.0,
+        "p90": 249.0
+      },
+      "RETAKE": {
+        "p10": 72.0,
+        "median": 91.0,
+        "p90": 100.0
+      },
+      "RESCREEN": {
+        "p10": 79.0,
+        "median": 85.0,
+        "p90": 94.0
+      }
+    }
+  ],
+  "all_calibration_photos": {
+    "threshold": 0.11723854,
+    "sensitivity": 0.9277777777777778,
+    "specificity": 0.740909090909091,
+    "REFER": 224,
+    "RETAKE": 91,
+    "RESCREEN": 85,
+    "referable_given_all_clear": 7,
+    "sight_threatening_given_all_clear": 1
+  }
+}

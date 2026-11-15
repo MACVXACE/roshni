@@ -104,6 +104,22 @@ def build(res_dir):
     r = R["results"]
     d = {}
     d["aptos_test_n"] = r["fine_tuned"]["n"]
+    lc_p = os.path.join(res_dir, "local_calibration.json")
+    if not os.path.exists(lc_p) and os.path.exists(os.path.join(res_dir, "deepdrid_predictions.csv")):
+        import local_calibration
+        local_calibration.run(res_dir)
+    if os.path.exists(lc_p):
+        lc = json.load(open(lc_p))
+        s = next(x for x in lc["samples"] if x["patients"] == 50)
+        d["lc_patients"], d["lc_photos"], d["lc_draws"] = s["patients"], s["photos_median"], s["draws"]
+        d["lc_sens"], d["lc_spec"] = 100 * s["sensitivity"]["median"], 100 * s["specificity"]["median"]
+        d["lc_sens_range"] = f"{100 * s['sensitivity']['p10']:.1f}% to {100 * s['sensitivity']['p90']:.1f}%"
+        d["lc_spec_range"] = f"{100 * s['specificity']['p10']:.1f}% to {100 * s['specificity']['p90']:.1f}%"
+        d["lc_allclear"], d["lc_sev_allclear"] = s["referable_given_all_clear"]["median"], s["sight_threatening_given_all_clear"]["median"]
+        d["lc_refer"] = s["REFER"]["median"]
+        d["lc_frozen_sens"], d["lc_frozen_spec"] = 100 * lc["frozen"]["sensitivity"], 100 * lc["frozen"]["specificity"]
+        d["lc_frozen_allclear"], d["lc_frozen_refer"] = lc["frozen"]["referable_given_all_clear"], lc["frozen"]["REFER"]
+        d["lc_eval_patients"] = lc["evaluation_patients"]
     if "seconds" in R:
         d["run_minutes"] = round(R["seconds"] / 60)
     sp_p = os.path.join(res_dir, "aptos_split.csv")

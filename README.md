@@ -40,7 +40,7 @@ Held-out APTOS test (352 photos, 152 referable) and the external DeepDRiD set:
 | Fine-tuned, external DeepDRiD (China) | 0.911 (0.897 to 0.925) | 56.1% | 97.2% | 307 | 25 |
 
 - **By severity (APTOS test):** 17 of 17 severe and 29 of 33 proliferative eyes were referred.
-- **External photos:** at the frozen cut-off sensitivity fell to 56.1% though AUC stayed 0.911: the model still ranks eyes well, but a cut-off set on Indian photos was too strict here, so each clinic must re-set it on its own graded photos.
+- **External photos:** at the frozen cut-off sensitivity fell to 56.1% though AUC stayed 0.911: the ranking carried over, but the cut-off set on Indian photos was too strict here. Testing our own fix after seeing this: re-setting the cut-off on about 200 labelled photos from 50 other patients of these hospitals gave 92.8% sensitivity and 74.1% specificity on the validation photos, and false all-clears fell from 46 to 7 (appendix).
 - **Worse photos (stress test):** sensitivity on the DeepDRiD validation photos fell from 55.0% to 10.6% (blur, strong), yet with the quality check false all-clears stayed at 51 or fewer (46 on the originals), against up to 161 without it; strong compression instead cut specificity to 35.9% (appendix).
 - **Where it fails:** [TEAM_TO_WRITE(where_it_fails): two missed eyes from results/missed_external.png (or the team-only APTOS gallery) and the reason you see in each, e.g. blur, small lesions near the edge, or a grade you would dispute]
 - **What we learned:** [TEAM_TO_WRITE(what_we_learned): two or three sentences on what surprised you, e.g. how the external photos, the poor-quality photos or the stress test changed what you believed, and what you would do differently]
@@ -179,6 +179,8 @@ Held-out APTOS test (352 photos, 152 referable) and the external DeepDRiD set:
 | Referable eyes given an all-clear | 81 | 46 |
 | Grade 3 to 4 eyes given an all-clear | 13 | 4 |
 
+**Re-setting the cut-off locally (added after seeing the external result; the frozen results above stay the main ones).** We drew a "clinic sample" of DeepDRiD training patients (whole patients, all their photos), set the referral cut-off for 90% sensitivity on it with the same function used to freeze the original, and scored the full workflow on the 400 validation photos from 100 other patients; the grading model never saw any DeepDRiD photo. Over 500 random samples of 50 patients: sensitivity 92.8% (10th to 90th percentile 87.2% to 96.7%) instead of 55.0%, specificity 74.1% (63.6% to 85.9%) instead of 97.7%; referable eyes given an all-clear 7 instead of 46 (severe or proliferative: 1), at the cost of 224 referrals instead of 104. The same hospitals supply both sets, so this shows the procedure works, not that one cut-off fits every clinic. See `results/local_calibration.png` and `local_calibration.py`.
+
 **Photo-quality check:** found poor photos with AUC 0.708; flags 65.1% of poor photos and 38.5% of good ones (53.0% of all photos sent to retake or refer on quality).
 
 **External AUC interval** resampling whole patients (each has up to four photos): 0.890 to 0.930.
@@ -191,6 +193,7 @@ Held-out APTOS test (352 photos, 152 referable) and the external DeepDRiD set:
 | `Roshni_DR_Screening.ipynb` | The full training run on a free Kaggle GPU (the experiment itself ran in 11 minutes): data, near-duplicate split, baselines, training, frozen thresholds, external test, quality check, stress test, CPU timing, web export |
 | `drscreen.py` | The core: preprocessing, model, metrics, the decision rule, stress-test changes, Grad-CAM, the English and Urdu note |
 | `run_dr.py` | The experiment, end to end; writes everything in `results/` |
+| `local_calibration.py` | Re-setting the cut-off on a small local sample (added after the external result; needs no GPU) |
 | `results/` | Outputs of the run: `results.json`, per-photo predictions, the model (`model_best.pt`) and quality check (`quality_gate.pkl`), figures (no APTOS photos) |
 | `web/` | The browser demo (ONNX Runtime Web; works offline after the first visit); `export_web.py` builds it from the run |
 | `app.py` | An optional Gradio version of the demo |

@@ -105,6 +105,22 @@ cells = [
          "display(st[cols].round(3))\n"
          "display(Show('results/stress_test.png', width=900))\n"
          "display(Show('results/stress_examples.png', width=900))"),
+    md("### 3b. Re-setting the cut-off on a small local sample\n"
+       "Added **after** we saw the external drop, to test our own advice that each clinic must re-set the cut-off on its own "
+       "graded photos. Calibration samples come from DeepDRiD *training* patients and are scored on the *validation* "
+       "patients (no patient in both). The frozen results above stay the main results."),
+    code("import local_calibration\n"
+         "lc = local_calibration.run('results', draws=500)\n"
+         ""
+         "rows_lc = [dict(clinic_sample=f\"{s['patients']} patients (~{s['photos_median']} photos)\",\n"
+         "                sensitivity=f\"{s['sensitivity']['median']:.1%} ({s['sensitivity']['p10']:.1%} to {s['sensitivity']['p90']:.1%})\",\n"
+         "                specificity=f\"{s['specificity']['median']:.1%} ({s['specificity']['p10']:.1%} to {s['specificity']['p90']:.1%})\",\n"
+         "                referable_all_clears=int(s['referable_given_all_clear']['median']), referrals=int(s['REFER']['median'])) for s in lc['samples']]\n"
+         "f = lc['frozen']\n"
+         "rows_lc.insert(0, dict(clinic_sample='frozen cut-off (Indian photos)', sensitivity=f\"{f['sensitivity']:.1%}\", specificity=f\"{f['specificity']:.1%}\",\n"
+         "                       referable_all_clears=f['referable_given_all_clear'], referrals=f['REFER']))\n"
+         "display(pd.DataFrame(rows_lc))\n"
+         "display(Show('results/local_calibration.png', width=900))"),
     md("## 4. The trained model, live, on the five demo photos\n"
        "These DeepDRiD validation photos are bundled with the browser demo (`web/examples`). Each goes through exactly the "
        "clinic path: open, crop, resize, score, quality check, decide. The saved scores from the Kaggle run are shown for "

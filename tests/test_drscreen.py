@@ -169,3 +169,26 @@ def test_team_inputs_fill_markers_and_optional_blocks(tmp_path):
     assert "Photo A was blurred." in out and "[TEAM_TO_WRITE(ai_tools)" in out      # filled vs still waiting
     assert "Default problem." in out and "A hypothesis." in out and "<!-- team" not in out
     assert used == {"where_it_fails", "adoption"}
+
+
+def test_local_calibration_keeps_patients_apart_and_scores_workflow(tmp_path):
+    import json
+    import pandas as pd
+    import local_calibration as lcm
+    rng = np.random.default_rng(1)
+    rows = []
+    for part, pats in (("training", range(0, 60)), ("validation", range(100, 130))):
+        for pid in pats:
+            for k in range(4):
+                g = int(rng.integers(0, 5))
+                rows.append(dict(patient_id=pid, image_id=f"{pid}_{k}", grade=g, part=part, Source="x", poor_quality=0,
+                                 p_referable=float(np.clip(0.2 * g + rng.normal(0, 0.1), 0, 1)), p_poor=0.1))
+    pd.DataFrame(rows).to_csv(tmp_path / "deepdrid_predictions.csv", index=False)
+    json.dump({"frozen": {"ref_threshold": 0.9, "poor_threshold": 0.5, "target_sensitivity": 0.9}}, open(tmp_path / "results.json", "w"))
+    out = lcm.run(str(tmp_path), draws=20)
+    assert out["evaluation_patients"] == 30
+    assert out["frozen"]["threshold"] == 0.9
+    s = out["samples"][0]
+    assert 0 <= s["sensitivity"]["median"] <= 1 and s["draws"] > 0
+    assert s["sensitivity"]["median"] >= out["frozen"]["sensitivity"]   # a lower, locally set cut-off catches more
+    assert (tmp_path / "local_calibration.png").exists()
