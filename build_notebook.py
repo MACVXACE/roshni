@@ -3,6 +3,7 @@ import nbformat as nbf
 
 md, code = nbf.v4.new_markdown_cell, nbf.v4.new_code_cell
 src = {f: open(f, encoding="utf-8").read() for f in ["drscreen.py", "run_dr.py", "app.py", "fill_report.py", "export_web.py",
+                                                       "local_calibration.py", "two_photo.py",
                                                        "README.template.md", "VIDEO_SCRIPT.template.md",
                                                        "web/index.html", "web/roshni.js"]}
 
@@ -32,6 +33,8 @@ cells = [
     code("%%writefile README.template.md\n" + src["README.template.md"]),
     code("%%writefile VIDEO_SCRIPT.template.md\n" + src["VIDEO_SCRIPT.template.md"]),
     code("%%writefile export_web.py\n" + src["export_web.py"]),
+    code("%%writefile local_calibration.py\n" + src["local_calibration.py"]),
+    code("%%writefile two_photo.py\n" + src["two_photo.py"]),
     code("%%writefile web_index.html\n" + src["web/index.html"]),
     code("%%writefile web_roshni.js\n" + src["web/roshni.js"]),
     code("import os, subprocess, sys\n"

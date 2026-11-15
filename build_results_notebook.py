@@ -93,8 +93,8 @@ cells = [
          "    d = np.where(v.p_referable >= THR, 'REFER', np.where(gate & (v.p_poor >= PT), 'RETAKE', 'RESCREEN'))\n"
          "    ref, sev = (v.grade >= 2).values, (v.grade >= 3).values\n"
          "    return {'REFER': (d == 'REFER').sum(), 'RETAKE': (d == 'RETAKE').sum(), 'RESCREEN (all-clear)': (d == 'RESCREEN').sum(),\n"
-         "            'referable eyes given an all-clear': ((d == 'RESCREEN') & ref).sum(),\n"
-         "            'grade 3-4 eyes given an all-clear': ((d == 'RESCREEN') & sev).sum()}\n"
+         "            'referable photos given an all-clear': ((d == 'RESCREEN') & ref).sum(),\n"
+         "            'grade 3-4 photos given an all-clear': ((d == 'RESCREEN') & sev).sum()}\n"
          "display(pd.DataFrame({'without quality check': run(False), 'with quality check': run(True)}))\n"
          "print('Quality check finds poor photos with AUC', round(roc_auc_score(v.poor_quality, v.p_poor), 3))"),
     md("## 3. Stress test: photos made worse in four fixed ways, at two strengths\n"
@@ -246,7 +246,7 @@ cells = [
          "          f'specificity {res[\"results\"][\"external_all\"][\"specificity\"]:.1%}')\n"
          "else:\n"
          "    print('results_v2/ not found')"),
-    md("## Where it fails\nReferable eyes given an all-clear on the external photos (lowest scores first). "
+    md("## Where it fails\nReferable photos given an all-clear on the external photos (lowest scores first). "
        "Our reading of them is in the README's Results section."),
     code("display(Show('results/missed_external.png', width=1000))"),
 ]

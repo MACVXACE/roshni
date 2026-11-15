@@ -380,6 +380,8 @@ def main():
     for tpl, out in (("README.template.md", "README.md"), ("VIDEO_SCRIPT.template.md", "VIDEO_SCRIPT.md")):
         text, used = apply_team(open(tpl, encoding="utf-8").read(), team)
         text = re.sub(r"<!-- if:v2 -->(.*?)<!-- /if:v2 -->", (lambda m: m.group(1)) if "v2" in R else "", text, flags=re.S)
+        # results/non_retinal.json comes from non_retinal_check.py (needs the model); in a fresh training run it may not exist yet
+        text = re.sub(r"<!-- if:nr -->(.*?)<!-- /if:nr -->", (lambda m: m.group(1)) if "nr_n" in R.get("derived", {}) else "", text, flags=re.S)
         text, missing = fill(text, R)
         outputs[out] = text
         all_missing += [f"{tpl}: {m}" for m in missing]

@@ -72,7 +72,7 @@ def build_app(results_dir: str, examples_dir: str | None = None) -> gr.Blocks:
         gr.Markdown("# Roshni: offline diabetic eye triage for primary-care diabetes clinics in Pakistan\n"
                     "For a clinic that can take retinal photos but has no eye specialist on site. Upload one photo taken at a "
                     "diabetes check-up; the tool suggests one next step for the doctor to confirm: **refer**, **retake the photo**, "
-                    "or **rescreen in 12 months**. A poor photo never gets an all-clear, and never blocks a referral.  \n"
+                    "or **rescreen in 12 months**. A photo judged too poor to read gets a retake instead of an all-clear, and never blocks a referral.  \n"
                     f"_Thresholds were frozen before testing (referral threshold set for {fr['target_sensitivity']:.0%} sensitivity on validation). "
                     "Prototype for a student hackathon; not medical advice and not a diagnosis._")
         with gr.Row():
@@ -82,7 +82,7 @@ def build_app(results_dir: str, examples_dir: str | None = None) -> gr.Blocks:
                                          label="Languages on the note")
                 btn = gr.Button("Screen this photo", variant="primary")
                 if ex:
-                    gr.Examples(ex, inp, label="Example photos from the held-out test sets")
+                    gr.Examples(ex, inp, label="Example photos")
             with gr.Column():
                 card = gr.HTML()
                 grades = gr.Label(num_top_classes=5, label="Estimated severity")
@@ -96,7 +96,7 @@ def build_app(results_dir: str, examples_dir: str | None = None) -> gr.Blocks:
             w = res["workflow"]["with_quality_gate"]
             wo = res["workflow"]["without_quality_gate"]
             gr.Markdown(f"On {w['photos']} external photos (DeepDRiD validation): {w['REFER']} refer, {w['RETAKE']} retake, "
-                        f"{w['RESCREEN']} rescreen. Referable eyes given an all-clear: **{w['referable_given_all_clear']}** "
+                        f"{w['RESCREEN']} rescreen. Referable photos given an all-clear: **{w['referable_given_all_clear']}** "
                         f"with the photo-quality check vs **{wo['referable_given_all_clear']}** without it.")
     return demo
 
