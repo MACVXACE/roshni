@@ -83,7 +83,7 @@ Held-out APTOS test (352 photos, 152 referable) and external DeepDRiD:
 - Grad-CAM (Selvaraju et al. 2017): https://arxiv.org/abs/1610.02391
 - Libraries: PyTorch https://pytorch.org, scikit-learn https://scikit-learn.org, pandas https://pandas.pydata.org, Pillow https://python-pillow.org, matplotlib https://matplotlib.org, Gradio https://www.gradio.app, ONNX Runtime and ONNX Runtime Web https://onnxruntime.ai, NumPy https://numpy.org, scikit-image (sample photos in `non_retinal_check.py`) https://scikit-image.org
 - Tools for tests and the video only: Playwright https://playwright.dev, FFmpeg https://ffmpeg.org, Node.js https://nodejs.org
-- AI tools: Claude (Anthropic), https://claude.ai: code, experiment design, research checks and write-up drafting; Claude Fable 5.2 (Anthropic): redesign of the demo page
+- AI tools: Claude (Anthropic), https://claude.ai: code, experiment design, research checks and write-up drafting (Varun), and help for Laziza and Zainab; Claude Fable 5.2 (Anthropic), https://claude.ai: redesign of the demo page (Zainab); ChatGPT (OpenAI), https://chatgpt.com: used by Laziza and Zainab; Gemini (Google), https://gemini.google.com, through the Argon assistant: brief brainstorming (Varun)
 
 ---
 
