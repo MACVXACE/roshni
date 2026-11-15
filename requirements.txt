@@ -10,3 +10,4 @@ onnx                 # (1.23.2)
 onnxruntime          # (1.29.0)
 gradio               # (6.32.0) only for the optional app.py
 pytest               # (9.1.1)
+scikit-image         # (0.26.0) only for the sample photos in non_retinal_check.py

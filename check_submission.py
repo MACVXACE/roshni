@@ -90,7 +90,7 @@ def main():
     unlinked = [ln.strip() for ln in src_block.splitlines() if ln.strip().startswith("- ") and "http" not in ln and "TEAM_TO_WRITE" not in ln]
     ok("every credit in Sources has a link (official rule)") if not unlinked else fix(f"credits without a link: {unlinked}")
     big = [(os.path.join(d, f), os.path.getsize(os.path.join(d, f)) / 1e6) for d, _, fs in os.walk(x.publish_dir) for f in fs
-           if os.path.getsize(os.path.join(d, f)) > 25e6]
+           if ".git" not in d.split(os.sep) and os.path.getsize(os.path.join(d, f)) > 25e6]   # git's own packs are not uploaded files
     ok("no file over GitHub's 25 MB web-upload limit") if not big else fix(f"files over 25 MB: {big}")
 
     if x.video:

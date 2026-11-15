@@ -43,7 +43,7 @@ tiny lesions hidden by shadows, glare, and camera shifts
 ## ai_tools
 <!-- OWNER: everyone. REQUIRED (rules: cite every AI tool). List every assistant each of you used and what for,
 e.g. "Claude (Anthropic): code, research checks and write-up drafting; ChatGPT (OpenAI): ..." -->
-Claude (Anthropic), https://claude.ai: code, experiment design, research checks and write-up drafting
+Claude (Anthropic), https://claude.ai: code, experiment design, research checks and write-up drafting; Claude Fable 5.2 (Anthropic): redesign of the demo page
 
 ## demo_link
 <!-- OWNER: Varun. REQUIRED. The GitHub Pages link to the browser demo, e.g. https://USERNAME.github.io/roshni/web/ -->

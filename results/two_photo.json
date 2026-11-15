@@ -1,0 +1,79 @@
+{
+  "rule": "refer if either photo of the eye scores at or above the frozen cut-off; workflow takes the most cautious of the two decisions",
+  "post_hoc": true,
+  "ref_threshold": 0.6139345765113831,
+  "poor_threshold": 0.5,
+  "grades_differ_within_eye": 2,
+  "patients_skipped": [
+    164
+  ],
+  "photos_skipped": 4,
+  "all": {
+    "per_photo": {
+      "n": 1596,
+      "positives": 700,
+      "sensitivity": 0.5614285714285714,
+      "specificity": 0.9720982142857143,
+      "missed": 307,
+      "false_alarms": 25
+    },
+    "per_eye_two_photos": {
+      "n": 798,
+      "positives": 350,
+      "sensitivity": 0.68,
+      "specificity": 0.953125,
+      "missed": 112,
+      "false_alarms": 21,
+      "sensitivity_ci": [
+        0.6242340312748477,
+        0.7342226100966701
+      ],
+      "specificity_ci": [
+        0.9342105263157895,
+        0.970918848873442
+      ]
+    },
+    "patients": 399
+  },
+  "validation": {
+    "per_photo": {
+      "n": 400,
+      "positives": 180,
+      "sensitivity": 0.55,
+      "specificity": 0.9772727272727273,
+      "missed": 81,
+      "false_alarms": 5
+    },
+    "per_eye_two_photos": {
+      "n": 200,
+      "positives": 90,
+      "sensitivity": 0.6888888888888889,
+      "specificity": 0.9545454545454546,
+      "missed": 28,
+      "false_alarms": 5,
+      "sensitivity_ci": [
+        0.5789315155358276,
+        0.7951875684556408
+      ],
+      "specificity_ci": [
+        0.9137931034482759,
+        0.9900024752475247
+      ]
+    },
+    "patients": 100,
+    "workflow_per_photo": {
+      "REFER": 104,
+      "RETAKE": 154,
+      "RESCREEN": 142,
+      "referable_given_all_clear": 46,
+      "sight_threatening_given_all_clear": 4
+    },
+    "workflow_per_eye_two_photos": {
+      "REFER": 67,
+      "RETAKE": 92,
+      "RESCREEN": 41,
+      "referable_given_all_clear": 14,
+      "sight_threatening_given_all_clear": 0
+    }
+  }
+}

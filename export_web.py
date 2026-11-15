@@ -56,7 +56,7 @@ def _examples(results_dir, out_dir, n_each=1):
         (safe[(safe.decision == "RETAKE") & (safe.poor_quality == 1) & (safe.grade <= 1)], "p_poor", False, ""),
         (safe[(safe.decision == "RESCREEN") & (safe.grade == 0) & (safe.poor_quality == 0)], "p_poor", True, ""),
         (safe[(safe.decision == "RESCREEN") & (safe.grade == 2) & (safe.poor_quality == 0)], "p_referable", True,
-         ". Shown on purpose: one of the referable eyes Roshni misses"),
+         ". Shown on purpose: one of the referable photos Roshni misses"),
     ]
     os.makedirs(os.path.join(out_dir, "examples"), exist_ok=True)
     out, patients = [], set()

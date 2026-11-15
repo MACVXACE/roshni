@@ -120,6 +120,27 @@ def build(res_dir):
         d["lc_frozen_sens"], d["lc_frozen_spec"] = 100 * lc["frozen"]["sensitivity"], 100 * lc["frozen"]["specificity"]
         d["lc_frozen_allclear"], d["lc_frozen_refer"] = lc["frozen"]["referable_given_all_clear"], lc["frozen"]["REFER"]
         d["lc_eval_patients"] = lc["evaluation_patients"]
+    tp_p = os.path.join(res_dir, "two_photo.json")
+    if not os.path.exists(tp_p) and os.path.exists(os.path.join(res_dir, "deepdrid_predictions.csv")):
+        import two_photo
+        two_photo.run(res_dir)
+    if os.path.exists(tp_p):
+        tp = json.load(open(tp_p))
+        one, two = tp["all"]["per_photo"], tp["all"]["per_eye_two_photos"]
+        d["tp_one_sens"], d["tp_one_spec"] = 100 * one["sensitivity"], 100 * one["specificity"]
+        d["tp_two_sens"], d["tp_two_spec"] = 100 * two["sensitivity"], 100 * two["specificity"]
+        d["tp_two_ci"] = f"{100 * two['sensitivity_ci'][0]:.1f}% to {100 * two['sensitivity_ci'][1]:.1f}%"
+        d["tp_eyes"], d["tp_patients"] = two["n"], tp["all"]["patients"]
+        w = tp["validation"]["workflow_per_eye_two_photos"]
+        d["tp_val_eyes"] = tp["validation"]["per_eye_two_photos"]["n"]
+        d["tp_val_allclear"], d["tp_val_sev"], d["tp_val_retake"] = (w["referable_given_all_clear"],
+                                                                       w["sight_threatening_given_all_clear"], w["RETAKE"])
+    nr_p = os.path.join(res_dir, "non_retinal.json")
+    if os.path.exists(nr_p):
+        nr = json.load(open(nr_p))
+        d["nr_n"], d["nr_allclear"] = nr["pictures"], nr["all_clears"]
+        d["nr_allclear_words"] = "none" if nr["all_clears"] == 0 else f"{nr['all_clears']} of them"
+        d["nr_retake"], d["nr_refer"] = nr["counts"]["RETAKE"], nr["counts"]["REFER"]
     if "seconds" in R:
         d["run_minutes"] = round(R["seconds"] / 60)
     sp_p = os.path.join(res_dir, "aptos_split.csv")
@@ -181,7 +202,7 @@ def build(res_dir):
             f"were {int(clean.referable_all_clear_with_check)} on the originals and between {w_lo} and {w_hi} across the "
             f"{len(changed)} changes, against up to {wo_hi} without it; the check sent up to "
             f"{100 * changed.retake_share.max():.0f}% of photos to a retake. Strong compression failed the other way: "
-            f"specificity fell to {100 * wspec.specificity:.1f}% ({lab(wspec)}), so many healthy eyes would be referred")
+            f"specificity fell to {100 * wspec.specificity:.1f}% ({lab(wspec)}), so many photos without referable disease would be referred")
         d["stress_brief"] = (f"on external photos sensitivity fell to {100 * worst.sensitivity:.1f}% at worst ({lab(worst)}), yet with the quality check "
                              f"false all-clears stayed at {w_hi} or fewer, against up to {wo_hi} without it; strong compression "
                              f"cut specificity to {100 * wspec.specificity:.1f}%")
@@ -221,10 +242,27 @@ def build(res_dir):
     if "workflow" in R:
         w, wo = R["workflow"]["with_quality_gate"], R["workflow"]["without_quality_gate"]
         names = [("REFER", "Refer"), ("RETAKE", "Retake"), ("RESCREEN", "Rescreen (all-clear)"),
-                 ("referable_given_all_clear", "Referable eyes given an all-clear"),
-                 ("sight_threatening_given_all_clear", "Grade 3 to 4 eyes given an all-clear")]
+                 ("referable_given_all_clear", "Referable photos given an all-clear"),
+                 ("sight_threatening_given_all_clear", "Grade 3 to 4 photos given an all-clear")]
         T["workflow"] = table([[label, wo[k], w[k]] for k, label in names], ["", "Without quality check", "With quality check"])
     T["stress"] = T_stress
+    if R.get("external_by_source"):
+        ss = [100 * x["sensitivity"] for x in R["external_by_source"]]
+        d["src_sens_min"], d["src_sens_max"] = min(ss), max(ss)
+    # A real-world yardstick: LumineticsCore's pivotal trial pre-specified sensitivity above 85% and specificity
+    # above 82.5% (Abramoff et al. 2018). Different reference standard, unit and population: a yardstick, not a test.
+    BAR_SENS, BAR_SPEC = 0.85, 0.825
+    bar = [("Held-out APTOS test, frozen cut-off", "photo", r["fine_tuned"]["sensitivity"], r["fine_tuned"]["specificity"]),
+           ("Unseen hospitals (DeepDRiD), frozen cut-off", "photo", r["external_all"]["sensitivity"], r["external_all"]["specificity"])]
+    if "lc_sens" in d:
+        bar.append((f"Unseen hospitals, cut-off re-set on {d['lc_patients']} local patients (post-hoc)", "photo", d["lc_sens"] / 100, d["lc_spec"] / 100))
+    if "tp_two_sens" in d:
+        bar.append(("Unseen hospitals, two photos per eye (post-hoc)", "eye", d["tp_two_sens"] / 100, d["tp_two_spec"] / 100))
+    T["bar"] = table([(n, u, f"{100 * se:.1f}%", f"{100 * sp:.1f}%",
+                       "yes" if (se > BAR_SENS and sp > BAR_SPEC) else "no") for n, u, se, sp in bar],
+                     ["Setting", "Unit", "Sensitivity", "Specificity", "Above both (85% and 82.5%)?"])
+    d["bar_met_n"] = sum(se > BAR_SENS and sp > BAR_SPEC for _, _, se, sp in bar)
+    d["bar_met_words"] = "None of our settings clears both yet" if d["bar_met_n"] == 0 else f"{d['bar_met_n']} of our settings clear both"
     v2p = os.path.join(os.path.dirname(os.path.abspath(res_dir)), "results_v2", "results.json")
     if os.path.exists(v2p):      # v2 (pre-registered, PREREGISTRATION_v2.md): reported next to v1 whatever the verdict
         V = json.load(open(v2p))

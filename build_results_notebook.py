@@ -16,8 +16,8 @@ cells = [
        "browser model (`web/model.onnx`). The training itself is in `Roshni_DR_Screening.ipynb` (needs a GPU, run on Kaggle).\n\n"
        "1. Recompute every headline number from the per-photo predictions, independently of the code that wrote the README\n"
        "2. The photo-quality check: false all-clears with and without it\n"
-       "3. The stress test on deliberately worse photos\n"
-       "4. Run the trained model live on the five demo photos, with heat maps and the clinic note\n"
+       "3. The stress test on deliberately worse photos; re-setting the cut-off locally; two photos per eye\n"
+       "4. Run the trained model live on the five demo photos, with heat maps and the clinic note; pictures that are not retinal photos\n"
        "5. Check that the browser model gives the same numbers as PyTorch\n"
        "6. Optional: re-score all 400 external validation photos and compare with the saved run\n\n"
        "No APTOS photo is shown here: the competition's rules do not allow sharing its images. "
@@ -121,6 +121,22 @@ cells = [
          "                       referable_all_clears=f['referable_given_all_clear'], referrals=f['REFER']))\n"
          "display(pd.DataFrame(rows_lc))\n"
          "display(Show('results/local_calibration.png', width=900))"),
+    md("### 3c. Two photos per eye\n"
+       "Also added **after** the external result; nothing is re-trained or re-tuned. DeepDRiD has two photos of every eye "
+       "(as LumineticsCore and EyeArt ask for). An eye is referred if **either** photo scores at or above the frozen cut-off; "
+       "the workflow takes the more cautious of the two decisions. Results are per eye, so the unit differs from the per-photo results."),
+    code("import two_photo\n"
+         "tp = two_photo.run('results')\n"
+         "rows_tp = []\n"
+         "for part in ('all', 'validation'):\n"
+         "    for unit, r in (('one photo', tp[part]['per_photo']), ('two photos per eye', tp[part]['per_eye_two_photos'])):\n"
+         "        ci = r.get('sensitivity_ci')\n"
+         "        rows_tp.append(dict(DeepDRiD=part, unit=unit, n=r['n'], sensitivity=f\"{r['sensitivity']:.1%}\" + (f\" ({ci[0]:.1%} to {ci[1]:.1%})\" if ci else ''),\n"
+         "                            specificity=f\"{r['specificity']:.1%}\", missed=r['missed'], false_alarms=r['false_alarms']))\n"
+         "display(pd.DataFrame(rows_tp))\n"
+         "print('Validation workflow per photo:', tp['validation']['workflow_per_photo'])\n"
+         "print('Validation workflow per eye (two photos):', tp['validation']['workflow_per_eye_two_photos'])\n"
+         "print('Left out (file names do not pair into two photos per eye): patient', tp['patients_skipped'], f\"({tp['photos_skipped']} photos)\")"),
     md("## 4. The trained model, live, on the five demo photos\n"
        "These DeepDRiD validation photos are bundled with the browser demo (`web/examples`). Each goes through exactly the "
        "clinic path: open, crop, resize, score, quality check, decide. The saved scores from the Kaggle run are shown for "
@@ -148,7 +164,7 @@ cells = [
          "print('Same decision as the saved run:', (live.decision == live.saved_decision).sum(), 'of', len(live))\n"
          "print(f'CPU time per photo here: median {np.median(times):.2f} s')"),
     code("from PIL import Image as PILImage\n"
-         "fig, axes = plt.subplots(2, len(cfg['examples']), figsize=(3.3 * len(cfg['examples']), 7.4))\n"
+         "fig, axes = plt.subplots(2, len(cfg['examples']), figsize=(2.6 * len(cfg['examples']), 5.9), dpi=72)   # small, so GitHub can show the notebook\n"
          "for i, (ex, r) in enumerate(zip(cfg['examples'], rows)):\n"
          "    f = os.path.join('web', ex['file']); base = ds.prep_image(f, SIZE)\n"
          "    cam = np.asarray(PILImage.fromarray(np.uint8(ds.gradcam_map(model, f, SIZE, device='cpu') * 255)).resize((SIZE, SIZE), PILImage.BILINEAR)) / 255\n"
@@ -165,6 +181,14 @@ cells = [
     md("### The note the clinic gets (English and Urdu)"),
     code("display(HTML(ds.slip_html(rows[0]['decision'])))\n"
          "print('Languages shown:', [ds.LANGS[c]['name'] + ('' if ds.LANGS[c]['checked'] else ' (translation being checked)') for c in ds.shown_langs()])"),
+    md("### Pictures that are not retinal photos\n"
+       "Roshni has no separate 'is this a retina?' check, so this asks the safety question directly: does any non-retinal picture "
+       "get an all-clear? Plain and noisy images, a page of text and a chart are made here; the everyday photos are scikit-image's "
+       "bundled samples (skipped if scikit-image is not installed). No photo of a person is used."),
+    code("import non_retinal_check\n"
+         "nr = non_retinal_check.run('results')\n"
+         "display(pd.DataFrame(nr['rows']))\n"
+         "print('All-clears given to non-retinal pictures:', nr['all_clears'], 'of', nr['pictures'], '|', nr['counts'])"),
     md("## 5. The browser model gives the same numbers as PyTorch\n"
        "`web/model.onnx` is what runs in the browser demo. Here it is run with ONNX Runtime on the same inputs."),
     code("try:\n"

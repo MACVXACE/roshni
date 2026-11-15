@@ -1,103 +1,332 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Roshni: diabetic eye screening that runs on your device</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2f6fdb">
+<meta name="theme-color" content="#12232e">
 <link rel="icon" href="icons/icon-192.png">
 <style>
-  :root { --ink:#1f2328; --muted:#5b6470; --line:#e1e4e8; --bg:#fafbfc; --accent:#2f6fdb; }
-  * { box-sizing: border-box; }
-  body { margin:0; font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Naskh Arabic","Noto Sans Devanagari",sans-serif; color:var(--ink); background:#fff; }
-  header, main, footer { max-width:1040px; margin:0 auto; padding:0 20px; }
-  header { padding-top:28px; }
-  h1 { font-size:1.6rem; margin:0 0 6px; letter-spacing:-0.01em; }
-  .lede { color:var(--muted); margin:0 0 6px; max-width:760px; }
-  .warn { display:inline-block; font-size:.85rem; background:#fff4e5; color:#7a4100; border-radius:6px; padding:4px 10px; margin:8px 0 18px; }
-  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:24px; }
-  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-  .panel { border:1px solid var(--line); border-radius:10px; padding:16px; background:#fff; }
-  .panel h2 { font-size:1rem; margin:0 0 10px; }
-  label.pick { display:block; border:2px dashed var(--line); border-radius:10px; padding:18px; text-align:center; cursor:pointer; background:var(--bg); }
-  label.pick:hover { border-color:var(--accent); }
-  label.pick:has(input:disabled) { opacity:.55; cursor:wait; }   /* greyed out until the model has loaded */
-  #file { display:block; margin:8px auto 0; }
-  #status { color:var(--muted); font-size:.9rem; min-height:1.4em; margin:10px 0; }
-  #langs label { margin-right:14px; font-size:.95rem; white-space:nowrap; }
-  #examples { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-  .ex { border:1px solid var(--line); background:#fff; border-radius:8px; padding:4px; width:120px; cursor:pointer; text-align:left; font:inherit; }
-  .ex img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:5px; display:block; }
-  .ex span { display:block; font-size:.72rem; color:var(--muted); margin-top:3px; line-height:1.25; }
-  #excredit { font-size:.75rem; color:var(--muted); margin-top:6px; }
-  #card { border-left:6px solid var(--line); border-radius:8px; padding:12px 14px; background:var(--bg); }
-  #decision { font-size:1.5rem; font-weight:700; }
-  #scores, #timing { font-size:.9rem; color:var(--muted); margin-top:4px; }
-  .g { display:grid; grid-template-columns: 120px 1fr 44px; align-items:center; gap:8px; font-size:.88rem; margin:3px 0; }
-  .bar { height:10px; background:var(--line); border-radius:5px; overflow:hidden; display:block; }
-  .bar span { display:block; height:100%; background:var(--accent); }
-  .n { margin:8px 0; line-height:1.6; }
-  .n small { color:var(--muted); }
-  .n[dir="rtl"] { font-size:1.08rem; }
-  canvas { width:100%; max-width:384px; border-radius:8px; display:block; }
-  .imgs { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .cap { font-size:.78rem; color:var(--muted); margin-top:3px; }
-  footer { color:var(--muted); font-size:.85rem; padding-top:20px; padding-bottom:40px; }
-  footer p { margin:6px 0; }
+  /* Clinical decision-support look. Colour carries meaning only (red refer, amber retake, teal rescreen).
+     No web fonts or outside files, so the page keeps working offline. */
+  :root {
+    --bg:#faf8f4; --paper:#ffffff; --tint:#f2eee6; --line:#e4ded3; --line2:#d6cfc2;
+    --ink:#12232e; --ink2:#3e4c56; --muted:#5f6b74; --faint:#5f6b74;   /* small grey text kept at 4.5:1 contrast or more */
+    --teal:#1f6f6b; --teal2:#2a8a84; --tealbg:#e8f2f0;
+    --refer:#b4382c; --referbg:#fbeeec; --retake:#a8650f; --retakebg:#fbf2e4; --rescreen:#1f6f6b; --rescreenbg:#e8f2f0;
+    --r:16px; --shadow:0 1px 2px rgba(18,35,46,.04), 0 18px 40px -24px rgba(18,35,46,.22);
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font:15.5px/1.6 ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+  html[lang="ur"] body { font-family:"Noto Naskh Arabic","Geeza Pro","Segoe UI",Tahoma,ui-sans-serif,sans-serif; }
+  html[lang="ur"] .longtext { font-family:"Noto Nastaliq Urdu","Jameel Noori Nastaleeq","Urdu Typesetting","Noto Naskh Arabic",serif; line-height:2.15; }
+  a { color:var(--teal); }
+  button { font:inherit; }
+  :focus-visible { outline:2px solid var(--teal); outline-offset:2px; }
+  .wrap { max-width:1160px; margin:0 auto; padding:0 28px; }
+  .machine { display:none; }   /* English originals for the automated tests and the video script */
+
+  /* top bar */
+  .top { border-bottom:1px solid var(--line); background:var(--bg); }
+  .top .wrap { display:flex; align-items:center; justify-content:space-between; gap:16px; height:64px; }
+  .brand { display:flex; align-items:center; gap:12px; min-width:0; }
+  .mark { width:26px; height:26px; border-radius:50%; border:1.5px solid var(--teal); position:relative; flex:none; }
+  .mark::after { content:""; position:absolute; inset:7px; border-radius:50%; background:var(--teal); }
+  .brand b { font-size:1.02rem; letter-spacing:.01em; font-weight:650; }
+  .brand small { display:block; color:var(--muted); font-size:.75rem; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .seg { display:inline-flex; border:1px solid var(--line2); border-radius:10px; padding:3px; background:var(--paper); gap:2px; }
+  .seg button { border:0; background:transparent; color:var(--ink2); padding:6px 12px; border-radius:7px; cursor:pointer; font-size:.84rem; white-space:nowrap; }
+  .seg button[aria-pressed="true"] { background:var(--ink); color:#fff; }
+  .seg button:hover:not([aria-pressed="true"]) { background:var(--tint); }
+  .langwrap { display:flex; align-items:center; gap:10px; }
+  .langwrap > span { font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); }
+
+  /* intro */
+  body::before { content:""; display:block; height:3px; background:linear-gradient(90deg,var(--teal),var(--ink)); }
+  .intro { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr); gap:48px; padding:64px 0 40px; align-items:center; }
+  .kicker { font-size:.74rem; text-transform:uppercase; letter-spacing:.18em; color:var(--teal); font-weight:650; margin:0 0 16px; display:flex; align-items:center; gap:10px; }
+  .kicker::before { content:""; width:22px; height:1.5px; background:var(--teal); }
+  html[lang="ur"] .kicker { letter-spacing:0; font-size:.9rem; }
+  h1 { font-size:clamp(2.3rem,5vw,3.9rem); line-height:1.02; letter-spacing:-.035em; font-weight:300; margin:0 0 20px; color:var(--ink); }
+  html[lang="ur"] h1 { font-weight:500; letter-spacing:0; line-height:1.5; }
+  .lede { color:var(--ink2); font-size:1.08rem; margin:0; max-width:600px; }
+  .cta { display:flex; flex-wrap:wrap; gap:10px; margin:26px 0 18px; }
+  .cta a { text-decoration:none; }
+  .disc { font-size:.82rem; color:#7a4a0c; background:var(--retakebg); border:1px solid #efdcbc; border-radius:10px; padding:9px 12px; max-width:600px; }
+  .hero-vis { margin:0; display:grid; justify-items:center; gap:14px; }
+  .orbit { position:relative; width:min(320px,70vw); aspect-ratio:1; border-radius:50%; display:grid; place-items:center;
+    background:radial-gradient(circle, var(--paper) 58%, var(--tealbg) 59% 100%); box-shadow:0 0 0 1px var(--line), var(--shadow); }
+  .orbit::before, .orbit::after { content:""; position:absolute; inset:-18px; border-radius:50%; border:1px solid var(--line); }
+  .orbit::after { inset:-38px; border-style:dashed; border-color:var(--line2); opacity:.6; }
+  .orbit img { width:78%; height:78%; border-radius:50%; object-fit:cover; display:block; background:#000; box-shadow:0 18px 40px -20px rgba(18,35,46,.6); }
+  .hero-vis figcaption { font-size:.72rem; color:var(--faint); margin-top:26px; }
+  .hl { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin:0 0 26px; border-top:1px solid var(--line2); border-bottom:1px solid var(--line2); }
+  .hl > div { padding:18px 20px 18px 0; border-inline-end:1px solid var(--line); padding-inline-start:20px; }
+  .hl > div:first-child { padding-inline-start:0; }
+  .hl > div:last-child { border-inline-end:0; }
+  .hl b { display:block; font-size:.95rem; font-weight:650; color:var(--ink); margin-bottom:3px; }
+  .hl span { font-size:.82rem; color:var(--muted); line-height:1.45; display:block; }
+
+  /* workflow stages */
+  .steps { list-style:none; margin:0 0 22px; padding:0; display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line); border-radius:var(--r); background:var(--paper); overflow:hidden; box-shadow:var(--shadow); }
+  .steps li { position:relative; padding:16px 18px 16px; display:flex; gap:12px; align-items:flex-start; border-inline-end:1px solid var(--line); transition:background .3s; }
+  .steps li:last-child { border-inline-end:0; }
+  .steps .num { width:26px; height:26px; border-radius:50%; border:1px solid var(--line2); color:var(--muted); font-size:.78rem; font-weight:600; display:grid; place-items:center; flex:none; font-variant-numeric:tabular-nums; transition:all .3s; }
+  .steps b { display:block; font-size:.9rem; font-weight:600; color:var(--ink2); line-height:1.3; }
+  .steps small { display:block; color:var(--faint); font-size:.76rem; margin-top:2px; line-height:1.3; }
+  .steps li::after { content:""; position:absolute; inset-inline:0; bottom:0; height:2px; background:transparent; transition:background .3s; }
+  /* idle: step 1 is current */
+  body[data-stage="idle"] .steps li[data-step="0"] .num, body:not([data-stage]) .steps li[data-step="0"] .num { border-color:var(--teal); color:var(--teal); }
+  body[data-stage="idle"] .steps li[data-step="0"]::after { background:var(--teal); }
+  body[data-stage="idle"] .steps li[data-step="0"] b { color:var(--ink); }
+  /* working: 1 done, 2 and 3 running (they run together, in one pass of the model) */
+  body[data-stage="working"] .steps li[data-step="0"] .num,
+  body[data-stage="done"] .steps li:not([data-step="3"]) .num { background:var(--teal); border-color:var(--teal); color:#fff; }
+  body[data-stage="working"] .steps li[data-step="1"], body[data-stage="working"] .steps li[data-step="2"] { background:var(--tealbg); }
+  body[data-stage="working"] .steps li[data-step="1"] .num, body[data-stage="working"] .steps li[data-step="2"] .num { border-color:var(--teal); color:var(--teal); animation:pulse 1s ease-in-out infinite; }
+  body[data-stage="working"] .steps li[data-step="1"]::after, body[data-stage="working"] .steps li[data-step="2"]::after { background:var(--teal); }
+  body[data-stage="done"] .steps li[data-step="3"] .num { border-color:var(--ink); background:var(--ink); color:#fff; }
+  body[data-stage="done"] .steps li[data-step="3"]::after { background:var(--ink); }
+  body[data-stage="done"] .steps b, body[data-stage="working"] .steps li:not([data-step="3"]) b { color:var(--ink); }
+  @keyframes pulse { 50% { opacity:.45; } }
+
+  /* tool */
+  .tool { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:22px; align-items:start; scroll-margin-top:84px; }
+  .panel { background:var(--paper); border:1px solid var(--line); border-radius:var(--r); padding:24px; box-shadow:var(--shadow); }
+  .label { font-size:.72rem; text-transform:uppercase; letter-spacing:.14em; color:var(--muted); font-weight:600; margin:0 0 12px; }
+  html[lang="ur"] .label { letter-spacing:0; font-size:.86rem; }
+  .label.gap { margin-top:26px; }
+
+  #drop { position:relative; display:block; border:1.5px dashed var(--line2); border-radius:12px; background:var(--tint); cursor:pointer; transition:border-color .2s, background .2s; overflow:hidden; }
+  #drop:hover, #drop.over, #drop:focus-within { border-color:var(--teal); background:#eef3f2; }
+  #drop:has(input:disabled) { cursor:wait; opacity:.6; }   /* greyed out until the model has loaded */
+  .dz { display:grid; justify-items:center; gap:8px; padding:34px 18px; text-align:center; }
+  .dz .ring { width:54px; height:54px; border-radius:50%; border:1.5px solid var(--teal); display:grid; place-items:center; }
+  .dz .ring::after { content:""; width:16px; height:16px; border-radius:50%; background:var(--teal); opacity:.85; }
+  .dz strong { font-size:1rem; font-weight:600; color:var(--ink); }
+  .dz small { color:var(--muted); font-size:.82rem; max-width:340px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:10px; padding:10px 16px; font-size:.9rem; font-weight:600; cursor:pointer; border:1px solid transparent; transition:background .2s, border-color .2s; }
+  .btn.primary { background:var(--ink); color:#fff; }
+  .btn.primary:hover { background:var(--teal); }
+  .btn.ghost { background:var(--paper); color:var(--ink); border-color:var(--line2); }
+  .btn.ghost:hover { border-color:var(--ink2); }
+  #file { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; }
+  .pv { display:none; grid-template-columns:120px 1fr; gap:16px; align-items:center; padding:16px; }
+  .pv img { width:120px; height:120px; object-fit:cover; border-radius:50%; background:#000; box-shadow:0 0 0 1px var(--line2), 0 0 0 6px var(--paper), 0 0 0 7px var(--line); }
+  .pv .cap2 { font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:8px; }
+  body.has-image .dz { display:none; }
+  body.has-image .pv { display:grid; }
+
+  .stat { display:flex; align-items:center; gap:9px; margin:14px 2px 2px; font-size:.86rem; color:var(--ink2); min-height:1.5em; }
+  .stat::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--faint); flex:none; }
+  #statusText[data-kind="ready"]::before, #statusText[data-kind="done"]::before { background:var(--teal); }
+  #statusText[data-kind="working"]::before, #statusText[data-kind="loading"]::before { background:var(--retake); animation:pulse 1s ease-in-out infinite; }
+  #statusText[data-kind^="err"] { color:var(--refer); }
+  #statusText[data-kind^="err"]::before { background:var(--refer); }
+  #offline { font-size:.78rem; color:var(--teal); margin:2px 2px 0; min-height:1.2em; }
+
+  #examples { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  @media (max-width: 420px) { #examples { grid-template-columns:1fr; } }
+  .ex { display:grid; grid-template-columns:46px 1fr; gap:10px; align-items:center; border:1px solid var(--line); background:var(--paper); border-radius:10px; padding:7px 10px 7px 7px; cursor:pointer; text-align:start; color:inherit; transition:border-color .2s, box-shadow .2s; }
+  .ex:hover { border-color:var(--line2); box-shadow:var(--shadow); }
+  .ex.on { border-color:var(--ink); box-shadow:0 0 0 1px var(--ink); }
+  .ex img { width:46px; height:46px; object-fit:cover; border-radius:50%; display:block; background:#000; }
+  .ex span { display:block; font-size:.74rem; color:var(--ink2); line-height:1.35; }
+  #excredit { font-size:.72rem; color:var(--faint); margin-top:10px; }
+  #langs { display:flex; flex-wrap:wrap; gap:8px; }
+  #langs label { display:inline-flex; align-items:center; gap:8px; font-size:.86rem; border:1px solid var(--line2); border-radius:999px; padding:6px 12px; cursor:pointer; background:var(--paper); }
+  #langs label:has(input:checked) { border-color:var(--teal); background:var(--tealbg); }
+  #langs input { accent-color:var(--teal); margin:0; }
+
+  /* result */
+  .empty { border:1px dashed var(--line2); border-radius:12px; padding:44px 20px; text-align:center; color:var(--muted); font-size:.92rem; background:var(--tint); }
+  body:has(#card:not([hidden])) .empty { display:none; }
+  #card { --c:var(--teal); --cb:var(--tealbg); border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--paper); animation:rise .35s ease both; }
+  #card[data-decision="REFER"] { --c:var(--refer); --cb:var(--referbg); }
+  #card[data-decision="RETAKE"] { --c:var(--retake); --cb:var(--retakebg); }
+  #card[data-decision="RESCREEN"] { --c:var(--rescreen); --cb:var(--rescreenbg); }
+  .rtop { background:var(--cb); border-bottom:1px solid var(--line); padding:18px 20px 16px; border-top:3px solid var(--c); }
+  .kick2 { font-size:.7rem; text-transform:uppercase; letter-spacing:.14em; color:var(--muted); font-weight:600; }
+  html[lang="ur"] .kick2 { letter-spacing:0; font-size:.82rem; }
+  #rTag { display:inline-block; margin-top:10px; font-size:.74rem; font-weight:700; letter-spacing:.12em; color:#fff; background:var(--c); border-radius:6px; padding:4px 9px; }
+  html[lang="ur"] #rTag { letter-spacing:0; }
+  #rHead { font-size:clamp(1.3rem,2.3vw,1.7rem); line-height:1.25; font-weight:600; letter-spacing:-.015em; color:var(--ink); margin:10px 0 6px; }
+  html[lang="ur"] #rHead { letter-spacing:0; line-height:1.7; }
+  #rBody { color:var(--ink2); margin:0; }
+  .rbody { padding:16px 20px 18px; }
+  #rNext { margin:0; padding:12px 14px; border-radius:10px; border:1px solid var(--line); border-inline-start:3px solid var(--c); font-weight:600; color:var(--ink); background:var(--paper); }
+  .tech { margin-top:14px; font-size:.8rem; color:var(--muted); font-variant-numeric:tabular-nums; display:grid; gap:2px; }
+  .tech span { font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:.76rem; }
+  html[lang="ur"] .tech span { font-family:inherit; font-size:.82rem; }
+  @keyframes rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  #notebox, #heatbox { animation:rise .4s ease both; }
+  .n { margin:10px 0; padding:14px 16px; border-radius:10px; border:1px solid var(--line); background:var(--tint); color:var(--ink); line-height:1.65; }
+  .n b { font-weight:600; }
+  .n small { color:var(--muted); display:inline-block; margin-top:4px; }
+  .n[dir="rtl"] { font-family:"Noto Nastaliq Urdu","Jameel Noori Nastaleeq","Urdu Typesetting","Noto Naskh Arabic",serif; font-size:1.06rem; line-height:2.2; }
+  .imgs { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .imgs > div { border:1px solid var(--line); border-radius:12px; padding:14px; background:var(--tint); }
+  canvas { width:100%; max-width:384px; display:block; margin:0 auto; border-radius:50%; background:#000; }
+  .cap { font-size:.76rem; color:var(--muted); margin-top:10px; text-align:center; }
+  .why { font-size:.8rem; color:var(--muted); margin:10px 0 0; }
+  .g { display:grid; grid-template-columns:130px 1fr 42px; align-items:center; gap:10px; font-size:.84rem; margin:6px 0; color:var(--ink2); font-variant-numeric:tabular-nums; }
+  .bar { height:6px; background:var(--tint); border:1px solid var(--line); border-radius:999px; overflow:hidden; display:block; }
+  .bar span { display:block; height:100%; background:var(--ink2); }
+  .pct { text-align:end; color:var(--muted); }
+  #newBtn { display:none; margin-top:20px; width:100%; }
+  body[data-stage="done"] #newBtn { display:flex; }
+
+  /* evidence */
+  footer { padding:34px 0 60px; }
+  .ev { display:grid; grid-template-columns:220px 1fr; gap:28px; border-top:1px solid var(--line2); padding-top:24px; }
+  .ev p { margin:0 0 8px; color:var(--ink2); font-size:.88rem; }
+  .ev .lim { color:var(--ink); }
+  .fine { color:var(--faint); font-size:.74rem; margin-top:28px; }
+
+  @media (max-width: 900px) {
+    .intro { grid-template-columns:1fr; gap:30px; padding:40px 0 30px; }
+    .hero-vis { order:-1; }
+    .orbit { width:min(220px,60vw); }
+    .hl { grid-template-columns:1fr 1fr; }
+    .hl > div:nth-child(2) { border-inline-end:0; }
+    .hl > div:nth-child(3) { padding-inline-start:0; }
+    .hl > div:nth-child(-n+2) { border-bottom:1px solid var(--line); }
+    .tool { grid-template-columns:1fr; }
+    .steps { grid-template-columns:1fr 1fr; }
+    .steps li:nth-child(2) { border-inline-end:0; }
+    .steps li:nth-child(-n+2) { border-bottom:1px solid var(--line); }
+    .ev { grid-template-columns:1fr; gap:10px; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding:0 16px; }
+    .top .wrap { height:auto; padding-top:10px; padding-bottom:10px; flex-wrap:wrap; }
+    .langwrap > span { display:none; }
+    .panel { padding:18px; }
+    .steps li { padding:12px; gap:9px; }
+    .steps small { display:none; }
+    .imgs { gap:8px; } .imgs > div { padding:8px; }
+    .g { grid-template-columns:96px 1fr 36px; }
+    .pv { grid-template-columns:88px 1fr; } .pv img { width:88px; height:88px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } html { scroll-behavior:auto; } }
 </style>
 </head>
-<body>
-<header>
-  <h1>Roshni: diabetic eye screening that runs on your device</h1>
-  <p class="lede">For a primary-care diabetes clinic in Pakistan with no eye specialist. Choose one retinal photo; Roshni suggests one next step for the doctor to confirm: <b>refer</b>, <b>retake the photo</b>, or <b>rescreen in 12 months</b>. A photo too poor to read gets a retake instead of an all-clear, and never blocks a referral.</p>
-  <p class="lede">Everything runs inside this browser. <b>The photo is never uploaded</b>, and after the first visit it works without internet.</p>
-  <span class="warn">Prototype for a student hackathon. Not medical advice and not a diagnosis.</span>
+<body data-stage="idle">
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><div><b>Roshni</b><small data-i18n="brandSub">Diabetic eye screening · research prototype</small></div></div>
+    <div class="langwrap"><span data-i18n="langLabel">Language</span><div id="uilang" class="seg" role="group" aria-label="Language"></div></div>
+  </div>
 </header>
-<main>
-  <div class="grid">
-    <section class="panel">
-      <h2>1. Choose a retinal photo</h2>
-      <label class="pick">Tap to choose a fundus photo (from the fundus camera or your files)
+
+<div class="wrap">
+  <section class="intro">
+    <div>
+      <p class="kicker" data-i18n="kicker">Primary care · Pakistan</p>
+      <h1><span data-i18n="title">Retinal image assessment</span></h1>
+      <p class="lede longtext" data-i18n="lede">For a primary-care diabetes clinic without an eye specialist. Upload one retinal photograph; Roshni suggests one next step for the doctor to confirm.</p>
+      <div class="cta"><a class="btn primary" href="#tool" data-i18n="ctaStart">Start an assessment</a><a class="btn ghost" href="#evidence" data-i18n="ctaEvidence">Evidence and limits</a></div>
+      <div class="disc" role="note" data-i18n="disclaimer">Research prototype for a student hackathon. Not medical advice, not a diagnosis, and not tested on patients in Pakistan.</div>
+    </div>
+    <figure class="hero-vis">
+      <div class="orbit"><img src="examples/410_l1.jpg" alt="" width="320" height="320"></div>
+      <figcaption data-i18n="heroCap">Example retinal photograph · DeepDRiD, CC BY-SA 4.0</figcaption>
+    </figure>
+  </section>
+
+  <section class="hl" aria-label="Highlights">
+    <div><b data-i18n="h1t">On-device</b><span data-i18n="h1d">The photo is analysed in this browser and is not uploaded.</span></div>
+    <div><b data-i18n="h2t">Offline-ready</b><span data-i18n="h2d">After the first visit, it works without internet.</span></div>
+    <div><b data-i18n="h3t">Three languages</b><span data-i18n="h3d">English, Urdu and Uzbek interface; the Uzbek patient note is being checked.</span></div>
+    <div><b data-i18n="h4t">Open code</b><span data-i18n="h4d">Code and results are public under the MIT licence.</span></div>
+  </section>
+
+  <ol class="steps" aria-label="Workflow">
+    <li data-step="0"><span class="num">1</span><span><b></b><small></small></span></li>
+    <li data-step="1"><span class="num">2</span><span><b></b><small></small></span></li>
+    <li data-step="2"><span class="num">3</span><span><b></b><small></small></span></li>
+    <li data-step="3"><span class="num">4</span><span><b></b><small></small></span></li>
+  </ol>
+
+  <main class="tool" id="tool">
+    <section class="panel" aria-labelledby="upTitle">
+      <p class="label" id="upTitle" data-i18n="uploadTitle">Upload a retinal photograph</p>
+      <label id="drop">
+        <div class="dz">
+          <span class="ring" aria-hidden="true"></span>
+          <strong data-i18n="uploadTitle">Upload a retinal photograph</strong>
+          <small data-i18n="uploadHint">Fundus photo from the clinic camera or your files · JPG or PNG · drag and drop or click</small>
+          <span class="btn primary" data-i18n="uploadBtn">Choose image</span>
+        </div>
+        <div class="pv">
+          <img id="preview" alt="">
+          <div><div class="cap2" data-i18n="previewCap">Selected image</div><span class="btn ghost" data-i18n="replaceBtn">Replace image</span></div>
+        </div>
         <input id="file" type="file" accept="image/*" disabled>
       </label>
-      <div id="status">Loading…</div>
-      <div id="offline" class="cap"></div>
-      <h2 style="margin-top:14px">Or try an example</h2>
+      <div class="machine" aria-hidden="true"><div id="status">Loading…</div></div>
+      <div id="statusText" class="stat" role="status" aria-live="polite"></div>
+      <div id="offline"></div>
+
+      <p class="label gap" data-i18n="examplesTitle">Or try an example photo</p>
       <div id="examples"></div>
       <div id="excredit"></div>
-      <h2 style="margin-top:16px">Languages on the note</h2>
+
+      <p class="label gap" data-i18n="noteLangs">Languages on the patient note</p>
       <div id="langs"></div>
     </section>
-    <section class="panel">
-      <h2>2. Suggested next step</h2>
-      <div id="card" hidden>
-        <div id="decision"></div>
-        <div id="scores"></div>
-        <div id="timing"></div>
+
+    <section class="panel" aria-labelledby="resTitle">
+      <p class="label" id="resTitle" data-i18n="resultTitle">Result</p>
+      <div class="empty" data-i18n="empty">Upload an image to begin. The result will appear here.</div>
+      <div id="card" hidden aria-live="polite">
+        <div class="machine" aria-hidden="true"><div id="decision"></div><div id="scores"></div><div id="timing"></div></div>
+        <div class="rtop">
+          <div class="kick2" data-i18n="kicker2">Suggested next step · for the doctor to confirm</div>
+          <span id="rTag"></span>
+          <div id="rHead"></div>
+          <p id="rBody" class="longtext"></p>
+        </div>
+        <div class="rbody">
+          <p id="rNext" class="longtext"></p>
+          <div class="tech"><span id="rScores"></span><span id="rTiming"></span></div>
+        </div>
       </div>
       <div id="notebox" hidden>
-        <h2 style="margin-top:14px">Note for the doctor and patient</h2>
+        <p class="label gap" data-i18n="noteTitle">Note for the doctor and patient</p>
         <div id="note"></div>
       </div>
       <div id="heatbox" hidden>
-        <h2 style="margin-top:14px">Where the model looked</h2>
+        <p class="label gap" data-i18n="imagesTitle">Original photograph and heat map</p>
         <div class="imgs">
-          <div><canvas id="photo"></canvas><div class="cap">Photo as the model sees it</div></div>
-          <div><canvas id="heat"></canvas><div class="cap">Heat map (Grad-CAM) for referable disease</div></div>
+          <div><canvas id="photo"></canvas><div class="cap" data-i18n="photoCap">Photo as the model sees it</div></div>
+          <div><canvas id="heat"></canvas><div class="cap" data-i18n="heatCap">Heat map (Grad-CAM) for referable disease</div></div>
         </div>
-        <h2 style="margin-top:14px">Estimated severity</h2>
+        <p class="why" data-i18n="heatWhy">The heat map shows which parts of the photo drove the score. It is not proof that disease is present or absent.</p>
+        <p class="label gap" data-i18n="gradesTitle">Estimated severity (model output)</p>
         <div id="grades"></div>
       </div>
+      <button id="newBtn" class="btn ghost" type="button" data-i18n="newBtn">Start new assessment</button>
     </section>
-  </div>
-</main>
-<footer>
-  <p id="results"></p>
-  <p id="thr"></p>
-  <p>Model: EfficientNet-B0 fine-tuned on APTOS 2019 (India), tested on DeepDRiD (China). Not tested on Pakistani patients or low-cost cameras. Does not detect macular oedema.</p>
-  <p><a id="repo" hidden>Code, results and limitations</a></p>
-</footer>
+  </main>
+
+  <footer id="evidence">
+    <div class="ev">
+      <p class="label" data-i18n="evidenceTitle">Evidence and limits</p>
+      <div>
+        <p id="results"></p>
+        <p id="thr"></p>
+        <p class="lim" data-i18n="model">Model: EfficientNet-B0 fine-tuned on APTOS 2019 (India), tested on DeepDRiD (China). Not tested on Pakistani patients or low-cost cameras. Does not detect macular oedema.</p>
+        <p><a id="repo" hidden data-i18n="repo">Code, results and limitations</a></p>
+      </div>
+    </div>
+    <p class="fine" data-i18n="fine">Roshni · VERITAS AI Hackathon 2026 · Research prototype, not a medical device</p>
+  </footer>
+</div>
 <script src="ort/ort.wasm.min.js"></script>
 <script src="roshni.js"></script>
 </body>

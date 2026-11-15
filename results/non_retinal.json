@@ -1,0 +1,89 @@
+{
+  "pictures": 13,
+  "counts": {
+    "REFER": 3,
+    "RETAKE": 10,
+    "RESCREEN": 0
+  },
+  "all_clears": 0,
+  "rows": [
+    {
+      "picture": "plain white",
+      "decision": "RETAKE",
+      "referable_score": 0.483,
+      "poor_photo_score": 0.928
+    },
+    {
+      "picture": "plain grey",
+      "decision": "RETAKE",
+      "referable_score": 0.547,
+      "poor_photo_score": 0.958
+    },
+    {
+      "picture": "plain black",
+      "decision": "RETAKE",
+      "referable_score": 0.582,
+      "poor_photo_score": 0.997
+    },
+    {
+      "picture": "random noise",
+      "decision": "RETAKE",
+      "referable_score": 0.427,
+      "poor_photo_score": 0.962
+    },
+    {
+      "picture": "flat skin colour",
+      "decision": "RETAKE",
+      "referable_score": 0.571,
+      "poor_photo_score": 0.983
+    },
+    {
+      "picture": "colour gradient",
+      "decision": "RETAKE",
+      "referable_score": 0.542,
+      "poor_photo_score": 0.641
+    },
+    {
+      "picture": "page of text",
+      "decision": "RETAKE",
+      "referable_score": 0.517,
+      "poor_photo_score": 1.0
+    },
+    {
+      "picture": "chart (ROC curve)",
+      "decision": "RETAKE",
+      "referable_score": 0.397,
+      "poor_photo_score": 0.999
+    },
+    {
+      "picture": "cat photo",
+      "decision": "RETAKE",
+      "referable_score": 0.592,
+      "poor_photo_score": 0.998
+    },
+    {
+      "picture": "coffee cup photo",
+      "decision": "REFER",
+      "referable_score": 0.843,
+      "poor_photo_score": 0.999
+    },
+    {
+      "picture": "rocket photo",
+      "decision": "RETAKE",
+      "referable_score": 0.382,
+      "poor_photo_score": 0.997
+    },
+    {
+      "picture": "deep-space image",
+      "decision": "REFER",
+      "referable_score": 0.955,
+      "poor_photo_score": 1.0
+    },
+    {
+      "picture": "stained tissue slide",
+      "decision": "REFER",
+      "referable_score": 0.831,
+      "poor_photo_score": 1.0
+    }
+  ]
+}
